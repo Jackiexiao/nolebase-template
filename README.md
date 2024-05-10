@@ -24,3 +24,9 @@ pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepres
 vercel 部署很简单, 在 vercel 中选择项目后, 修改构建的 output directory 为 .vitepress/dist 就行了（默认是 ./dist）
 
 netlify 等其他部署方式见[原仓库](https://github.com/nolebase/nolebase/)的说明
+
+如果你选择了用 vercel 部署，可以关闭 netflify 的 workflow.
+
+在 github仓库页面 -> Actions -> netlify 对应 workflow -> 右上角3个点 -> disable workflow
+
+<img width="204" alt="image" src="https://github.com/Jackiexiao/nolebase-template/assets/18050469/aa83c0f4-9ff6-4fc2-b5df-eb45f81f6773">
