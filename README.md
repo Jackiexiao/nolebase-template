@@ -30,3 +30,21 @@ netlify 等其他部署方式见[原仓库](https://github.com/nolebase/nolebase
 在 github仓库页面 -> Actions -> netlify 对应 workflow -> 右上角3个点 -> disable workflow
 
 <img width="204" alt="image" src="https://github.com/Jackiexiao/nolebase-template/assets/18050469/aa83c0f4-9ff6-4fc2-b5df-eb45f81f6773">
+
+## Obsidian 的设置
+### 关于图片链接问题
+如果你的 markdown 中的图片链接没有在当前文件所在目录下，会解析出错，无法在 vitepress 中正确渲染。如果没有这个问题，你可以跳过下面的内容
+
+解决方法： 推荐的  Obsidian Setting => Files and links 设置如下
+- New link format => Relative path to file
+-  Use `[[Wikilinks]]` => False
+- Default location for new attachments => In subfolder under current folder 
+-  Subfolder name => assets
+
+这么做有几个好处
+- 保持兼容性的markdown: 可以让文档也能在 github 中被正确渲染（github无法解析`[[双链]]`）
+- 方便迁移文件和图片，你只需要把图片文件夹和markdown文件一起复制就行（如果是全部汇总在某个文件夹下，以后复制比较麻烦）
+
+额外的 tips
+- 对于已有的笔记和图片链接，你可以考虑使用 obsidian 插件[obsidian-link-converter](https://github.com/ozntel/obsidian-link-converter) 来帮你做自动的转换 `[[wikilink]]` 为 relative_path 的 markdown link
+- 同时，我建议使用这个 [clear-unused-image](https://github.com/ozntel/oz-clear-unused-images-obsidian) 插件来帮助你清除无用的图片（但记得不要运行 clear attachment ，否则 vitepress 相关代码会被移除）
