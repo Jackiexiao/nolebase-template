@@ -2,7 +2,9 @@
 
 一个简约的博客/笔记网站模板，基于 markdown + obsidian + vitepress
 
-本仓库从[nolebase](https://github.com/nolebase/nolebase/) 精简而来，方便做 template 
+本仓库从[nolebase](https://github.com/nolebase/nolebase/) 精简而来，方便做 template，用于初始化仓库
+
+演示网站： https://nolebase-template.vercel.app
 
 做了如下改动
 - 精简仓库: 删除了原始的笔记，较大的文件，思源宋体文件， `.obsidian/`文件夹, `netlify`文件夹
@@ -14,22 +16,26 @@
 ```bash
 pnpm install # 安装
 pnpm docs:dev # dev模式,本地查看文档
-pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepress/dist 下
+pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepress/dist 下, 保证在本地能构建成功后再发布比较好
 ```
 
-你可以修改 metadata/index.ts 配置一下自己的网站信息
-再修改一下 index.md 配置一下首页
+需要修改的内容：
+- 可以修改 metadata/index.ts 配置一下自己的网站信息
+- 再修改一下 index.md 配置一下首页
+- 修改 `.vitepress/creators.ts`, 添加你的 github 地址，这样的话，在每个文章下面的贡献者那里就能够链接到你的 github 首页（否则只是一个名字，无法点击）。
 
 ## 部署
+### vercel 部署
 vercel 部署很简单, 在 vercel 中选择项目后, 修改构建的 output directory 为 .vitepress/dist 就行了（默认是 ./dist）
-
-netlify 等其他部署方式见[原仓库](https://github.com/nolebase/nolebase/)的说明
 
 如果你选择了用 vercel 部署，可以关闭 netflify 的 workflow.
 
 在 github仓库页面 -> Actions -> netlify 对应 workflow -> 右上角3个点 -> disable workflow
 
 <img width="204" alt="image" src="https://github.com/Jackiexiao/nolebase-template/assets/18050469/aa83c0f4-9ff6-4fc2-b5df-eb45f81f6773">
+
+### 其他方式部署
+其他部署方式见[原仓库](https://github.com/nolebase/nolebase/)的说明
 
 ## Obsidian 的设置
 ### 关于图片链接问题
@@ -48,3 +54,4 @@ netlify 等其他部署方式见[原仓库](https://github.com/nolebase/nolebase
 额外的 tips
 - 对于已有的笔记和图片链接，你可以考虑使用 obsidian 插件[obsidian-link-converter](https://github.com/ozntel/obsidian-link-converter) 来帮你做自动的转换 `[[wikilink]]` 为 relative_path 的 markdown link
 - 同时，我建议使用这个 [clear-unused-image](https://github.com/ozntel/oz-clear-unused-images-obsidian) 插件来帮助你清除无用的图片（但记得不要运行 clear attachment ，否则 vitepress 相关代码会被移除）
+
