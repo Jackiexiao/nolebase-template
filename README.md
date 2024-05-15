@@ -62,4 +62,9 @@ giscus 利用了 [GitHub Discussions](https://docs.github.com/en/discussions) 
 - 第1步，访问 giscus 网站： https://giscus.app/zh-CN， 参考网站上的说明，一步步操作，最后得到一个配置代码
 - 第2步，在 `./vitepress/theme/index.ts` 中修改 giscus 相关配置，在该文件中搜索 `giscusTalk`, 参考说明，修改配置即可
 
+## 其他替代方案
+- obsidian 官方的 publish 
+- https://github.com/oleeskild/obsidian-digital-garden
+- https://github.com/ObsidianPublisher/obsidian-github-publisher
+- https://github.com/alangrainger/share-note
 
