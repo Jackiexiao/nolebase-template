@@ -59,7 +59,7 @@ vercel 部署很简单, 在 vercel 中选择项目后, 修改构建的 output di
 giscus 利用了 [GitHub Discussions](https://docs.github.com/en/discussions) 实现的评论系统，让访客借助 GitHub 在你的网站上留下评论！（你的github仓库必须是公开的才能使用 giscus）
 
 具体配置方法
-- 第1步，访问 giscus 网站： https://giscus.app/zh-CN， 参考网站上的说明，一步步操作，最后得到一个配置代码
+- 第1步，访问 [Giscus](https://giscus.app/zh-CN) 网站， 参考网站上的说明，一步步操作，最后得到一个配置代码
 - 第2步，在 `./vitepress/theme/index.ts` 中修改 giscus 相关配置，在该文件中搜索 `giscusTalk`, 参考说明，修改配置即可
 
 ## 其他替代方案
