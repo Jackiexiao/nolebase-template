@@ -2,7 +2,7 @@
 
 ## 小音和猫猫的知识库
 
-欢迎来到小音和猫猫的知识库 [Nólëbase](https://nolebase.ayaka.io)，这里是 📒 笔记分区
+欢迎来到刘雪峰的知识库 [Nólëbase](https://nolebase.ayaka.io)，这里是 📒 笔记分区
 
 ## 想要自己部署和在本地启动强大的 Nólëbase 知识库，或者自己拥有一份？
 
