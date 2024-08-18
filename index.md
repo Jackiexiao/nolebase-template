@@ -3,7 +3,7 @@ layout: home
 sidebar: false
 
 title: CDUT
-titleTemplate: 记录回忆，知识和畅想的地方
+titleTemplate: 即将是最良心的量子物理教材
 
 hero:
   name: g~Nj$3J2^
