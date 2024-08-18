@@ -6,7 +6,7 @@ title: CDUT
 titleTemplate: 即将是最良心的量子物理教材
 
 hero:
-  name: g~Nj$3J2^
+  name: 脏脏包
   text: 记录回忆，知识和畅想的地方
   tagline: 以 Nólëbase 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
   image:
