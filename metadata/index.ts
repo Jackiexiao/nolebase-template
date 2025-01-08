@@ -1,6 +1,6 @@
 /** 文本 */
-export const siteName = 'Nólëbase'
-export const siteShortName = 'Nólëbase'
+export const siteName = 'ydc'
+export const siteShortName = 'ydc'
 export const siteDescription = '记录回忆，知识和畅想的地方'
 
 /** 文档所在目录 */
