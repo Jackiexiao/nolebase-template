@@ -209,7 +209,9 @@ export default defineConfig({
     },
     nav: [
       { text: '主页', link: '/' },
-      { text: '笔记', link: '/笔记/' },
+      { text: '知识管理', link: '/知识管理/' },
+      { text: '读书笔记', link: '/读书笔记/' },
+      { text: '观鸟小记', link: '/观鸟小记/' },
       { text: '最近更新', link: '/toc' },
     ],
     sidebar,
