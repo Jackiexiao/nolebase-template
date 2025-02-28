@@ -1,14 +1,12 @@
 ---
 layout: home
 sidebar: false
-
-title: Nólëbase
+title: Etteuqirb Redraug
 titleTemplate: 记录回忆，知识和畅想的地方
-
 hero:
   name: g~Nj$3J2^
   text: 记录回忆，知识和畅想的地方
-  tagline: 以 Nólëbase 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
+  tagline: 以 Etteuqirb Redraug 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
   image:
     src: /logo.svg
     alt: Vitest
@@ -22,7 +20,6 @@ hero:
     - theme: alt
       text: GitHub 上浏览
       link: https://github.com/nolebase/nolebase
-
 features:
   - title: 多样的主题和内容
     details: 本知识库和所生成的页面均由创作者们维护，涉及到生活中各方面知识和内容，也不乏我们的回忆和畅想。
