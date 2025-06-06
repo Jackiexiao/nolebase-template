@@ -21,7 +21,7 @@ hero:
       link: https://discord.gg/XuNFDcDZGj
     - theme: alt
       text: GitHub 上浏览
-      link: [[https://github.com/flveboy/nolebase-template]]
+      link: https://github.com/flveboy/nolebase-template
 
 features:
   - title: 多样的主题和内容
