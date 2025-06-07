@@ -9,8 +9,8 @@ hero:
   name: g~Nj$3J2^
   text: 用文字丈量世界
   tagline: 记忆的碎片在此重组
-              知识的尘埃在此结晶
-                  想象的云雾在此成雨
+  tagline: 知识的尘埃在此结晶
+  tagline: 想象的云雾在此成雨
   image:
     src: /logo.svg
     alt: Vitest
