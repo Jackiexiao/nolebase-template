@@ -27,6 +27,7 @@ features:
   - title: 多样的主题和内容
     details: 本知识库和所生成的页面均由创作者们维护，涉及到生活中各方面知识和内容，也不乏我们的回忆和畅想。
     icon: 🌈
+    link：/笔记/演示目录1/
   - title: 皆为 Markdown
     details: 使用 Markdown 和 Markdown 拓展语法编写和记录笔记，每一个页面都是 Markdown 文件。
     icon: 📃
