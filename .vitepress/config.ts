@@ -7,7 +7,7 @@ import MarkdownItMathjax3 from 'markdown-it-mathjax3'
 import { defineConfig } from 'vitepress'
 
 import { discordLink, githubRepoLink, siteDescription, siteName } from '../metadata'
-// import head from './head'
+import head from './head'
 
 const nolebase = presetMarkdownIt()
 
@@ -27,7 +27,7 @@ export default defineConfig({
   title: siteName,
   description: siteDescription,
   ignoreDeadLinks: true,
-  // head,
+  head,
   themeConfig: {
     search: {
       provider: 'local',
@@ -105,7 +105,7 @@ export default defineConfig({
           { text: '主页', link: '/' },
           { text: '笔记', link: '/笔记/' },
           { text: '万象视界', link: '/万象视界/' },
-          { text: '最近更新', link: '/toc' },
+          { text: '最近更新', link: '/zh-CN/toc' },
         ],
         socialLinks: [
           { icon: 'github', link: githubRepoLink },
