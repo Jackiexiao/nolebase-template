@@ -220,6 +220,7 @@ export default defineConfig({
           { folderName: '/万象视界', separate: true , autoGenerate: true },
         ], 'zh-CN'),
   },
+},
   markdown: {
     theme: {
       light: 'github-light',
