@@ -9,7 +9,7 @@ export const include = ['笔记', '生活']
 /** Repo */
 export const githubRepoLink = 'https://github.com/flveboy/nolebase-template'
 /** Discord */
-export const discordLink = 'https://discord.gg/XuNFDcDZGj'
+export const discordLink = 'https://loongdiary.netlify.app/'
 
 /** 无协议前缀域名 */
 export const plainTargetDomain = 'loongday.netlify.app/'
