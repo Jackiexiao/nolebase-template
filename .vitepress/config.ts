@@ -10,7 +10,7 @@ import { UnlazyImages } from '@nolebase/markdown-it-unlazy-img'
 
 import { discordLink, githubRepoLink, siteDescription, siteName, targetDomain } from '../metadata'
 import { creatorNames, creatorUsernames } from './creators'
-import { sidebar } from './docsMetadata.json'
+//import { sidebar } from './docsMetadata.json'
 
 import { calculateSidebar } from '@nolebase/vitepress-plugin-sidebar'
 
