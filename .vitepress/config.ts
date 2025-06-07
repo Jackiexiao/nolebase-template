@@ -216,8 +216,8 @@ export default defineConfig({
       { text: '最近更新', link: '/toc' },
     ],
     sidebar: calculateSidebar([
-          { folderName: '/笔记', separate: true },
-          { folderName: '/万象视界', separate: true },
+          { folderName: '/笔记', separate: true , autoGenerate: true},
+          { folderName: '/万象视界', separate: true , autoGenerate: true },
         ], 'zh-CN'),
   },
   markdown: {
