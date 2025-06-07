@@ -19,6 +19,9 @@ hero:
     - theme: alt
       text: GitHub 上浏览
       link: https://github.com/flveboy/nolebase-template
+    - theme: alt
+      text: 数字花园
+      link: https://loongdiary.netlify.app/
 
 features:
   - title: 多样的主题和内容
