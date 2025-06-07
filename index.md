@@ -3,12 +3,12 @@ layout: home
 sidebar: false
 
 title: Notes
-titleTemplate: 记录回忆，知识和畅想的地方
+titleTemplate: 所思即所见，每行都是一个世界
 
 hero:
   name: g~Nj$3J2^
-  text: 记录回忆，知识和畅想的地方
-  tagline: 以 Notes 为名，用文字记录世界
+  text: 记忆的碎片在此重组，知识的尘埃在此结晶，想象的云雾在此成雨
+  tagline: 以Notes为名，用文字丈量世界
   image:
     src: /logo.svg
     alt: Vitest
