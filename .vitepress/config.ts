@@ -7,7 +7,7 @@ import MarkdownItMathjax3 from 'markdown-it-mathjax3'
 import { defineConfig } from 'vitepress'
 
 import { discordLink, githubRepoLink, siteDescription, siteName } from '../metadata'
-import head from './head'
+// import head from './head'
 
 const nolebase = presetMarkdownIt()
 
@@ -27,7 +27,7 @@ export default defineConfig({
   title: siteName,
   description: siteDescription,
   ignoreDeadLinks: true,
-  head,
+  // head,
   themeConfig: {
     search: {
       provider: 'local',
