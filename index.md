@@ -8,7 +8,7 @@ titleTemplate: 记录回忆，知识和畅想的地方
 hero:
   name: g~Nj$3J2^
   text: 记录回忆，知识和畅想的地方
-  tagline: 以 Notes 为名，记录一切，即「知识库」
+  tagline: 以 Notes 为名，用文字记录世界
   image:
     src: /logo.svg
     alt: Vitest
