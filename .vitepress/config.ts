@@ -209,6 +209,7 @@ export default defineConfig({
         },
       },
     },
+  },
     nav: [
       { text: '主页', link: '/' },
       { text: '笔记', link: '/笔记/' },
