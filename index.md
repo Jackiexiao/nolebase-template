@@ -24,19 +24,22 @@ hero:
       link: https://loongdiary.netlify.app/
 
 features:
-  - title: 多样的主题和内容
-    details: 本知识库和所生成的页面均由创作者们维护，涉及到生活中各方面知识和内容，也不乏我们的回忆和畅想。
-    icon: 🌈
-    link: /笔记/演示目录1/
-  - title: 皆为 Markdown
-    details: 使用 Markdown 和 Markdown 拓展语法编写和记录笔记，每一个页面都是 Markdown 文件。
-    icon: 📃
-  - title: 由 VitePress 驱动
-    details: 基于 Vite 的强大静态文档页面生成器，它生成了我们知识库的页面，提供了简单易用的主题和工具。
-    icon: 🚀
-  - title: 由 Obsidian 驱动
-    details: 强大的知识库管理工具，支持花样繁多的插件和拓展，让知识管理变得更加简单。
-    icon: 🗃
+  - title: 生活记录舱
+    details: 「收藏日常的星光」，收纳散步见闻、午后思绪，每段文字都是生活散落的星光碎片
+    icon: 📝
+    link: /笔记/生活记录舱/index
+  - title: 技术沉淀库
+    details: 「给技术找个归处」，总结语法、工具调试经验，码成一步步向上的知识阶梯，一站式沉淀技能
+    icon: 💻
+    link: /笔记/技术沉淀库/index
+  - title: 工具百宝箱
+    details: 「工具说明书合集」，踩过的坑、好用插件，整理成避坑指南📕
+    icon: 🛠
+    link: /笔记/工具百宝箱/index
+  - title: 创意灵感簿
+    details: 「脑洞暂存区」，白天的畅想、深夜的灵光，在这里攒成能发芽的创意种子
+    icon: 📒
+    link: /笔记/创意灵感簿/index
 ---
 
 <HomePage />
