@@ -1,5 +1,6 @@
 import type { HeadConfig } from 'vitepress'
-import { creatorNames, creatorUsernames, siteDescription, siteName, targetDomain } from '../metadata'
+import { siteDescription, siteName, targetDomain } from '../metadata'
+import { creatorNames, creatorUsernames } from './creators'
 
 export default [
   ['meta', {
