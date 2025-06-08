@@ -210,6 +210,7 @@ export default defineConfig({
     nav: [
       { text: '主页', link: '/' },
       { text: '笔记', link: '/笔记/' },
+      { text: '万象视界', link: '/万象视界/' },
       { text: '最近更新', link: '/toc' },
     ],
     sidebar:calculateSidebar([
