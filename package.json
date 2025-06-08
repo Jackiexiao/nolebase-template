@@ -76,5 +76,8 @@
     "vitepress": "^1.0.2",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
     "vue": "^3.4.21"
+  },
+  "dependencies": {
+    "@nolebase/vitepress-plugin-sidebar": "2.13.5"
   }
 }
