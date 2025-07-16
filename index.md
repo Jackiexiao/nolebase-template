@@ -7,7 +7,7 @@ titleTemplate: To be or not to be
 
 hero:
   name: g~Nj$3J2^
-  text: That is a knowledge base.
+  text: 零的起点.
   tagline: 以 Nólëbase 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
   image:
     src: /logo.svg
