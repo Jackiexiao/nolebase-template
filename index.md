@@ -2,16 +2,16 @@
 layout: home
 sidebar: false
 
-title: Nólëbase
-titleTemplate: To be or not to be
+title: Nólëbase知识库
+titleTemplate: 构建个人知识体系
 
 hero:
-  name: g~Nj$3J2^
-  text: 零的起点.
+  name: Nólëbase
+  text: 知识的起点，创意的基石
   tagline: 以 Nólëbase 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
   image:
     src: /logo.svg
-    alt: Vitest
+    alt: Nólëbase
   actions:
     - theme: brand
       text: 开始阅读
@@ -21,7 +21,7 @@ hero:
       link: https://discord.gg/XuNFDcDZGj
     - theme: alt
       text: GitHub 上浏览
-      link: https://github.com/nolebase/nolebase
+      link: https://github.com/Jackiexiao/nolebase-template
 
 features:
   - title: 多样的主题和内容
