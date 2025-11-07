@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"f063f8d997c90d9d","type":"text","text":"浏览器\n（客户端）","x":-320,"y":-230,"width":220,"height":100},
+		{"id":"ab65ba3af69e9cf9","type":"text","text":"服务器","x":100,"y":-180,"width":180,"height":60},
+		{"id":"4fe88a9842fff71b","x":-540,"y":200,"width":260,"height":60,"type":"text","text":"Java程序"},
+		{"id":"db466b53b8beff75","x":100,"y":200,"width":250,"height":60,"type":"text","text":"JDK（运行环境）"}
+	],
+	"edges":[
+		{"id":"a233db3bb7794557","fromNode":"f063f8d997c90d9d","fromSide":"right","toNode":"ab65ba3af69e9cf9","toSide":"top","label":"请求"},
+		{"id":"b2ea2b634405a554","fromNode":"ab65ba3af69e9cf9","fromSide":"bottom","toNode":"f063f8d997c90d9d","toSide":"bottom","label":"响应"},
+		{"id":"f2dc868d47fecdac","fromNode":"4fe88a9842fff71b","fromSide":"right","toNode":"db466b53b8beff75","toSide":"left","fromEnd":"arrow","label":"运行"}
+	]
+}
