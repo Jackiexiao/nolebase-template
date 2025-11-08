@@ -4,6 +4,12 @@ html, body {
   -webkit-tap-highlight-color: transparent; /* 避免触屏下的点击高亮颜色 */
 }
 
+/* 隐藏主页的贡献者部分 */
+.content .main .vp-doc h2[id="meet-the-team"],
+.content .main .vp-doc .VPTeamMembers {
+  display: none !important;
+}
+
 /* 参考 Vitest */
 /* fix height ~ 2 lines of text: 3 or more cards per row */
 .VPTeamMembersItem.small .profile .data .affiliation {
