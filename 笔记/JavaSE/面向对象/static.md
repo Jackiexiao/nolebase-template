@@ -1,0 +1,16 @@
+---
+share: "true"
+---
+![Pasted image 20250924090114](../../img/Pasted%20image%2020250924090114.png)
+## 静态变量是随着类的加载而加载的，优先于对象出现的
+## 工具类
+![Pasted image 20250924080926](../../img/Pasted%20image%2020250924080926.png)
+![Pasted image 20250924081023](../../img/Pasted%20image%2020250924081023.png)
+	1、类名要见名知意
+	2、 私有化构造方法 %% 不让外界创建对象 %% 
+	3、方法定义为静态
+## static注意事项
+![Pasted image 20250924090107](../../img/Pasted%20image%2020250924090107.png)
+![Pasted image 20250924090749](../../img/Pasted%20image%2020250924090749.png)
+this 表示当前方法调用者的地址值。
+这个 this 是由虚拟机赋值的。
