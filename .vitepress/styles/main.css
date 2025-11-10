@@ -281,3 +281,15 @@ html, body {
   color: white;
   background-color: #4b4b4b;
 }
+
+/**
+  代码块自动换行样式
+*/
+
+.vp-doc div[class*="language-"] pre,
+.vp-doc div[class*="language-"] code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
