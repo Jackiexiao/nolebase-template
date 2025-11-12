@@ -293,3 +293,150 @@ html, body {
   overflow-wrap: break-word;
   word-break: break-word;
 }
+
+/**
+  全局文本自动换行样式
+*/
+
+/* 确保所有文本内容都能自动换行 */
+.vp-doc,
+.vp-doc p,
+.vp-doc li,
+.vp-doc td,
+.vp-doc th,
+.vp-doc div,
+.vp-doc span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 确保表格不会导致页面溢出 */
+.vp-doc table {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+/* 表格内容自动换行 */
+.vp-doc td,
+.vp-doc th {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* 确保内联代码不会导致页面溢出 */
+.vp-doc code:not([class*="language-"]) {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+/* 确保链接文本不会导致页面溢出 */
+.vp-doc a {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+/* 确保长单词或URL不会导致页面溢出 */
+.vp-doc {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/**
+  强制全局文本自动换行样式
+*/
+
+/* 确保整个页面内容不会溢出 */
+body, html {
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 确保所有容器都不会导致水平溢出 */
+.VPDoc,
+.VPDoc .content-container,
+.VPDoc .container,
+.vp-doc {
+  max-width: 100%;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 确保所有文本元素都能自动换行 */
+* {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* 特别处理可能导致溢出的元素 */
+.vp-doc *,
+.VPSidebar *,
+.VPNav *,
+.VPFooter * {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto;
+}
+
+/* 处理长URL和代码 */
+.vp-doc a,
+.vp-doc code,
+.vp-doc pre {
+  word-break: break-all !important;
+  white-space: pre-wrap !important;
+}
+
+/* 处理表格 */
+.vp-doc table {
+  table-layout: fixed;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+  white-space: normal;
+}
+
+.vp-doc td,
+.vp-doc th {
+  max-width: 100%;
+  white-space: normal;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* 处理列表 */
+.vp-doc ul,
+.vp-doc ol,
+.vp-doc li {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* 处理标题 */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6 {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* 处理图片 */
+.vp-doc img {
+  max-width: 100%;
+  height: auto;
+}
