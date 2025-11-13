@@ -40,6 +40,7 @@ const app = new Vue({
   },
   watch:{
     obj:{
+	  //深度监视，可以监视obj对象下所有的属性变化
       deep:true,
       //页面加载时或刷新时会立马执行一次
       immediate:true,
@@ -51,4 +52,5 @@ const app = new Vue({
 })
 </script>
 ```
+
 ![](../../img/Pasted%20image%2020251112145153.png)
