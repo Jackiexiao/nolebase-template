@@ -8,7 +8,7 @@ titleTemplate: 记录回忆，知识和畅想的地方
 hero:
   name: g~Nj$3J2^
   text: 记录回忆，知识和畅想的地方
-  tagline: 以 fenglingblogs 为名，读作 nole-base，取自意为「知识」的昆雅语 nólë 和意为「基础」的英文 base，即「知识库」
+  tagline: 此地名为「风铃日志」。愿它如檐下风铃，静候每一缕思维的清风，捕捉并记录那些知识交汇时发出的清脆回响。这里悬挂着我的见闻、思考与灵感的絮语，于时光的流转中，摇曳出属于自己的声响。
   image:
     src: /logo.svg
     alt: Vitest
