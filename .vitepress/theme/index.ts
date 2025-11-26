@@ -38,6 +38,7 @@ import { creators } from '../creators'
 import AppContainer from './components/AppContainer.vue'
 import DocFooter from './components/DocFooter.vue'
 import HomePage from './components/HomePage.vue'
+import PageTitle from './components/PageTitle.vue'
 import Share from './components/Share.vue'
 import TocList from './components/TocList.vue'
 
@@ -62,6 +63,7 @@ const ExtendedTheme: Theme = {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
       'doc-top': () => [
+        h(PageTitle),
         h(NolebaseHighlightTargetedHeading),
       ],
       'doc-footer-before': () => [
@@ -86,6 +88,7 @@ const ExtendedTheme: Theme = {
 
     app.component('HomePage', HomePage)
     app.component('DocFooter', DocFooter)
+    app.component('PageTitle', PageTitle)
     app.component('Share', Share)
     app.component('TocList', TocList)
     app.component('AppContainer', AppContainer)
