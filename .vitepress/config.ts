@@ -144,6 +144,13 @@ export default defineConfig({
     search: {
       provider: 'local',
       options: {
+        detailedView: true,
+        miniSearch: {
+          searchOptions: {
+            fuzzy: 0.2,
+            prefix: true,
+          },
+        },
         locales: {
           root: {
             translations: {
@@ -193,6 +200,15 @@ export default defineConfig({
           }
           else if (frontmatter.title) {
             headingPart = `# ${frontmatter.title}`
+          }
+          else {
+            // Fallback: use filename as title for search indexing
+            const fallbackTitle = env.relativePath 
+              ? env.relativePath.split('/').pop()?.replace(/\.md$/, '') || ''
+              : ''
+            if (fallbackTitle) {
+              headingPart = `# ${fallbackTitle}`
+            }
           }
 
           const tags = frontmatter.tags
