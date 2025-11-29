@@ -73,7 +73,7 @@ const getRecentUpdateDates = () => {
     // 如果没有更新，显示最近7天
     const today = new Date()
     const recentDates = []
-    for (let i =6; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) {
       const date = new Date(today)
       date.setDate(today.getDate() - i)
       recentDates.push({
@@ -347,7 +347,7 @@ onMounted(() => {
     
     <div class="calendar-content" :class="{ 'collapsed': !isCalendarExpanded }">
       <!-- 折叠状态下显示当前周的日期 -->
-      <div v-if="!isCalendarExpanded" class="collapsed-dates">
+      <div class="collapsed-dates">
         <div
           v-for="(dateInfo, index) in getRecentUpdateDates()"
           :key="index"
@@ -370,7 +370,7 @@ onMounted(() => {
       </div>
       
       <!-- 展开状态下的完整日历 -->
-      <div v-else>
+      <div class="expanded-calendar-view">
         <div class="calendar-weekdays">
           <div class="weekday" v-for="day in ['日', '一', '二', '三', '四', '五', '六']" :key="day">
             {{ day }}
@@ -503,31 +503,45 @@ onMounted(() => {
   background-color: var(--vp-c-bg-mute);
 }
 
+/* 动画相关样式 */
 .calendar-content {
-  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
+  max-height: 500px; /* 展开时的最大高度 */
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .calendar-content.collapsed {
-  max-height: 56px; /* 日期40px + padding 8px + 滚动条空间 */
-  overflow: hidden;
+  max-height: 72px; /* 折叠时的高度，增加以容纳滚动条 */
 }
 
-.calendar-content.collapsed .calendar-days {
-  display: none;
-}
-
-.calendar-content.collapsed .calendar-weekdays {
-  display: none;
-}
-
+/* 折叠状态下的日期行 */
 .collapsed-dates {
   display: flex;
   gap: 4px;
-  padding: 4px 0;
+  padding: 4px 0 12px 0; /* 增加底部padding给滚动条留出空间 */
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
+  
+  /* 绝对定位以实现淡入淡出效果 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  
+  /* 过渡效果 */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.calendar-content.collapsed .collapsed-dates {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .collapsed-dates::-webkit-scrollbar {
@@ -589,6 +603,21 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+}
+
+/* 展开状态下的完整日历 */
+.expanded-calendar-view {
+  /* 过渡效果 */
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  transform-origin: top;
+}
+
+.calendar-content.collapsed .expanded-calendar-view {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
 }
 
 .calendar-weekdays {
