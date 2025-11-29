@@ -41,6 +41,8 @@ import HomePage from './components/HomePage.vue'
 import PageTitle from './components/PageTitle.vue'
 import Share from './components/Share.vue'
 import TocList from './components/TocList.vue'
+import CustomSidebar from './components/CustomSidebar.vue'
+import CustomSidebarItem from './components/CustomSidebarItem.vue'
 
 import '@nolebase/vitepress-plugin-enhanced-readabilities/client/style.css'
 import '@nolebase/vitepress-plugin-highlight-targeted-heading/client/style.css'
@@ -54,6 +56,7 @@ import 'virtual:uno.css'
 
 import '../styles/main.css'
 import '../styles/vars.css'
+import '../styles/custom-sidebar.css'
 
 import('@nolebase/vitepress-plugin-inline-link-preview/client')
 
@@ -76,6 +79,9 @@ const ExtendedTheme: Theme = {
       'nav-screen-content-after': () => [
         h(NolebaseEnhancedReadabilitiesScreenMenu),
       ],
+      'sidebar-nav-before': () => [
+        h(CustomSidebar),
+      ],
     })
   },
   enhanceApp({ app }) {
@@ -93,6 +99,8 @@ const ExtendedTheme: Theme = {
     app.component('TocList', TocList)
     app.component('AppContainer', AppContainer)
     app.component('NolebaseUnlazyImg', NolebaseUnlazyImg)
+    app.component('CustomSidebar', CustomSidebar)
+    app.component('CustomSidebarItem', CustomSidebarItem)
 
     app.provide(NolebaseEnhancedReadabilitiesInjectionKey, {
       layoutSwitch: {

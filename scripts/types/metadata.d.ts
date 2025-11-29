@@ -3,6 +3,7 @@ export interface ArticleTree {
   text: string
   link?: string
   lastUpdated?: number
+  created?: number
   collapsible?: true
   collapsed?: true
   items?: ArticleTree[]

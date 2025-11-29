@@ -16,9 +16,36 @@ const list = computed(() => {
   return list.filter(item => item.link)
 })
 
+// 排序选项类型
+type SortOption = 'name-asc' | 'name-desc' | 'updated-desc' | 'updated-asc' | 'created-desc' | 'created-asc'
+
+// 当前排序方式
+const currentSort = ref<SortOption>('updated-desc')
+
+// 排序函数
+const sortArticles = (articles: ArticleTree[], sortType: SortOption): ArticleTree[] => {
+  const sorted = [...articles]
+  
+  switch (sortType) {
+    case 'name-asc':
+      return sorted.sort((a, b) => a.text.localeCompare(b.text, 'zh-CN'))
+    case 'name-desc':
+      return sorted.sort((a, b) => b.text.localeCompare(a.text, 'zh-CN'))
+    case 'updated-desc':
+      return sorted.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0))
+    case 'updated-asc':
+      return sorted.sort((a, b) => (a.lastUpdated || 0) - (b.lastUpdated || 0))
+    case 'created-desc':
+      return sorted.sort((a, b) => (b.created || 0) - (a.created || 0))
+    case 'created-asc':
+      return sorted.sort((a, b) => (a.created || 0) - (b.created || 0))
+    default:
+      return sorted
+  }
+}
+
 const sortedList = computed(() => {
-  const ls = [...list.value]
-  return ls.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0))
+  return sortArticles(list.value, currentSort.value)
 })
 
 // 筛选后的文章列表
@@ -26,7 +53,13 @@ const filteredList = ref<ArticleTree[]>(sortedList.value)
 
 // 处理筛选事件
 const handleFilter = (filteredItems: ArticleTree[]) => {
-  filteredList.value = filteredItems.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0))
+  filteredList.value = sortArticles(filteredItems, currentSort.value)
+}
+
+// 处理排序变更
+const handleSortChange = (sortType: SortOption) => {
+  currentSort.value = sortType
+  filteredList.value = sortArticles(filteredList.value, sortType)
 }
 </script>
 
@@ -37,8 +70,23 @@ const handleFilter = (filteredItems: ArticleTree[]) => {
     <div class="filter-results">
       <div class="results-header">
         <h2 class="results-title">最近更新</h2>
-        <div class="results-count">
-          共 {{ filteredList.length }} 个结果
+        <div class="results-actions">
+          <select 
+            v-model="currentSort" 
+            @change="handleSortChange(currentSort)" 
+            class="sort-select"
+            aria-label="排序方式"
+          >
+            <option value="name-asc">文件名 (A-Z)</option>
+            <option value="name-desc">文件名 (Z-A)</option>
+            <option value="updated-desc">编辑时间 (从新到旧)</option>
+            <option value="updated-asc">编辑时间 (从旧到新)</option>
+            <option value="created-desc">创建时间 (从新到旧)</option>
+            <option value="created-asc">创建时间 (从旧到新)</option>
+          </select>
+          <div class="results-count">
+            共 {{ filteredList.length }} 个结果
+          </div>
         </div>
       </div>
       
@@ -102,6 +150,38 @@ const handleFilter = (filteredItems: ArticleTree[]) => {
   font-weight: 600;
   margin: 0;
   color: var(--vp-c-text-1);
+}
+
+.results-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-select {
+  padding: 6px 32px 6px 12px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  background-color: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+}
+
+.sort-select:hover {
+  border-color: var(--vp-c-brand);
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--vp-c-brand);
+  box-shadow: 0 0 0 3px var(--vp-c-brand-soft);
 }
 
 .results-count {
@@ -185,7 +265,22 @@ const handleFilter = (filteredItems: ArticleTree[]) => {
   .results-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .results-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
+  }
+  
+  .sort-select {
+    width: 100%;
+  }
+  
+  .results-count {
+    text-align: center;
   }
   
   .item-meta {
@@ -196,5 +291,10 @@ const handleFilter = (filteredItems: ArticleTree[]) => {
   .result-item {
     padding: 12px;
   }
+}
+
+/* 暗色模式适配 */
+html.dark .sort-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 </style>

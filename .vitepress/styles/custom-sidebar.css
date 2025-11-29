@@ -1,0 +1,19 @@
+/* 隐藏默认侧边栏并调整自定义侧边栏样式 */
+
+/* 隐藏默认侧边栏的导航内容 */
+.VPSidebar .VPSidebarNav {
+  display: none !important;
+}
+
+/* 隐藏默认侧边栏组 */
+.VPSidebar .group {
+  display: none !important;
+}
+
+/* 响应式处理 - 确保在移动端也能正常工作 */
+@media (max-width: 960px) {
+  /* 自定义侧边栏在移动端的显示 */
+  body.sidebar-open .custom-sidebar {
+    transform: translateX(0) !important;
+  }
+}
