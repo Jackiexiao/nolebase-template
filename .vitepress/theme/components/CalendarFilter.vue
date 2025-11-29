@@ -67,26 +67,35 @@ function formatDateKey(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
-// 获取当前周的日期（用于折叠状态显示）
-const getCurrentWeekDates = () => {
-  const today = new Date()
-  const currentDay = today.getDay() // 0是周日，1是周一，以此类推
-  const diff = today.getDate() - currentDay // 获取本周第一天的日期
-  
-  const firstDayOfWeek = new Date(today.setDate(diff))
-  const weekDates = []
-  
-  // 获取本周7天的日期
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(firstDayOfWeek)
-    date.setDate(firstDayOfWeek.getDate() + i)
-    weekDates.push({
-      day: date.getDate(),
-      date: date
-    })
+// 获取最近有更新的日期（用于折叠状态显示）
+const getRecentUpdateDates = () => {
+  if (datesWithUpdates.value.size === 0) {
+    // 如果没有更新，显示最近7天
+    const today = new Date()
+    const recentDates = []
+    for (let i =6; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(today.getDate() - i)
+      recentDates.push({
+        day: date.getDate(),
+        date: date
+      })
+    }
+    return recentDates
   }
   
-  return weekDates
+  // 获取所有有更新的日期
+  const updateDates = Array.from(datesWithUpdates.value.keys())
+    .map(dateKey => {
+      const [year, month, day] = dateKey.split('-').map(Number)
+      return new Date(year, month - 1, day)
+    })
+    .sort((a, b) => b.getTime() - a.getTime()) // 按日期降序排序（最新的在前）
+  
+  return updateDates.map(date => ({
+    day: date.getDate(),
+    date: date
+  }))
 }
 
 // 获取当前月份的日期信息
@@ -340,7 +349,7 @@ onMounted(() => {
       <!-- 折叠状态下显示当前周的日期 -->
       <div v-if="!isCalendarExpanded" class="collapsed-dates">
         <div
-          v-for="(dateInfo, index) in getCurrentWeekDates()"
+          v-for="(dateInfo, index) in getRecentUpdateDates()"
           :key="index"
           class="collapsed-date"
           :class="{
