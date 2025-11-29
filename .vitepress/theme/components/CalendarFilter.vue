@@ -509,7 +509,7 @@ onMounted(() => {
 }
 
 .calendar-content.collapsed {
-  max-height: 40px; /* 只显示一行日期 */
+  max-height: 56px; /* 日期40px + padding 8px + 滚动条空间 */
   overflow: hidden;
 }
 
@@ -523,15 +523,27 @@ onMounted(() => {
 
 .collapsed-dates {
   display: flex;
-  justify-content: space-between;
   gap: 4px;
   padding: 4px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.collapsed-dates::-webkit-scrollbar {
+  height: 4px;
+}
+
+.collapsed-dates::-webkit-scrollbar-thumb {
+  background-color: var(--vp-c-divider);
+  border-radius: 2px;
 }
 
 .collapsed-date {
   position: relative;
-  flex: 1;
-  aspect-ratio: 1;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -540,6 +552,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
+  flex-shrink: 0;
 }
 
 .collapsed-date:hover {
