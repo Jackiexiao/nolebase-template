@@ -42,8 +42,8 @@ const datesWithUpdates = computed(() => {
   const dateMap = new Map<string, { count: number, color: string }>()
   
   props.items.forEach(item => {
-    if (item.lastUpdated) {
-      const date = new Date(item.lastUpdated)
+    if (item.created) {
+      const date = new Date(item.created)
       const dateKey = formatDateKey(date)
       
       if (!dateMap.has(dateKey)) {
@@ -67,35 +67,29 @@ function formatDateKey(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
-// 获取最近有更新的日期（用于折叠状态显示）
+// 获取本周的日期（用于折叠状态显示）
 const getRecentUpdateDates = () => {
-  if (datesWithUpdates.value.size === 0) {
-    // 如果没有更新，显示最近7天
-    const today = new Date()
-    const recentDates = []
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(today.getDate() - i)
-      recentDates.push({
-        day: date.getDate(),
-        date: date
-      })
-    }
-    return recentDates
+  const today = new Date()
+  const dayOfWeek = today.getDay() // 0 = 周日, 1 = 周一, ..., 6 = 周六
+  
+  // 计算本周日（周的开始）
+  const startOfWeek = new Date(today)
+  startOfWeek.setDate(today.getDate() - dayOfWeek)
+  startOfWeek.setHours(0, 0, 0, 0)
+  
+  const weekDates = []
+  
+  // 从周日到今天
+  for (let i = 0; i <= dayOfWeek; i++) {
+    const date = new Date(startOfWeek)
+    date.setDate(startOfWeek.getDate() + i)
+    weekDates.push({
+      day: date.getDate(),
+      date: date
+    })
   }
   
-  // 获取所有有更新的日期
-  const updateDates = Array.from(datesWithUpdates.value.keys())
-    .map(dateKey => {
-      const [year, month, day] = dateKey.split('-').map(Number)
-      return new Date(year, month - 1, day)
-    })
-    .sort((a, b) => b.getTime() - a.getTime()) // 按日期降序排序（最新的在前）
-  
-  return updateDates.map(date => ({
-    day: date.getDate(),
-    date: date
-  }))
+  return weekDates
 }
 
 // 获取当前月份的日期信息
@@ -274,7 +268,7 @@ watch([selectedStartDate, selectedEndDate], () => {
   const filtered = props.items.filter(item => {
     if (!item.lastUpdated) return false
     
-    const itemDate = new Date(item.lastUpdated)
+    const itemDate = new Date(item.created)
     const itemDateKey = formatDateKey(itemDate)
     const startKey = formatDateKey(selectedStartDate.value!)
     
