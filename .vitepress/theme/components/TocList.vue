@@ -111,6 +111,12 @@ const handleSortChange = (sortType: SortOption) => {
                 更新时间：{{ new Date(item.lastUpdated || 0).toLocaleDateString() }}
               </span>
             </div>
+            <div v-if="item.created" class="meta-item">
+              <span class="i-octicon:calendar-16 align-middle text-xs" />
+              <span class="align-middle">
+                创建时间：{{ new Date(item.created).toLocaleDateString() }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
