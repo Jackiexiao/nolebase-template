@@ -48,10 +48,9 @@ export async function listPages(dir: string, options: { target?: string, ignore?
   files.sort()
   return files
 }
-
 /**
- * 解析中文日期格式
- * 例如："星期六, 十一月 1日 2025, 10:32:01 上午"
+ * 解析日期格式
+ * 新格式："2025年-12月-01日 19:19"
  * @param dateStr 日期字符串
  * @returns 时间戳（毫秒）或 undefined
  */
@@ -59,47 +58,26 @@ function parseChineseDateString(dateStr: string): number | undefined {
   if (!dateStr || typeof dateStr !== 'string') return undefined
   
   try {
-    // 提取年月日时分秒
-    const yearMatch = dateStr.match(/(\d{4})/)
-    const monthMatch = dateStr.match(/(一|二|三|四|五|六|七|八|九|十|十一|十二)月/)
-    const dayMatch = dateStr.match(/(\d{1,2})日/)
-    const timeMatch = dateStr.match(/(\d{1,2}):(\d{2}):(\d{2})/)
-    const periodMatch = dateStr.match(/(上午|下午|晚上)/)
+    // 新格式：2025年-12月-01日 19:19
+    const match = dateStr.match(/(\d{4})年-(\d{1,2})月-(\d{1,2})日\s+(\d{1,2}):(\d{2})/)
     
-    if (!yearMatch || !monthMatch || !dayMatch || !timeMatch) return undefined
-    
-    const year = Number.parseInt(yearMatch[1])
-    const monthStr = monthMatch[1]
-    const day = Number.parseInt(dayMatch[1])
-    let hour = Number.parseInt(timeMatch[1])
-    const minute = Number.parseInt(timeMatch[2])
-    const second = Number.parseInt(timeMatch[3])
-    const period = periodMatch ? periodMatch[1] : '上午'
-    
-    // 月份映射
-    const monthMap: Record<string, number> = {
-      '一': 0, '二': 1, '三': 2, '四': 3, '五': 4, '六': 5,
-      '七': 6, '八': 7, '九': 8, '十': 9, '十一': 10, '十二': 11,
+    if (match) {
+      const year = Number.parseInt(match[1])
+      const month = Number.parseInt(match[2]) - 1 // JavaScript月份从0开始
+      const day = Number.parseInt(match[3])
+      const hour = Number.parseInt(match[4])
+      const minute = Number.parseInt(match[5])
+      
+      const date = new Date(year, month, day, hour, minute, 0)
+      return date.getTime()
     }
     
-    const month = monthMap[monthStr]
-    if (month === undefined) return undefined
-    
-    // 处理上午/下午/晚上
-    if ((period === '下午' || period === '晚上') && hour !== 12) {
-      hour += 12
-    } else if (period === '上午' && hour === 12) {
-      hour = 0
-    }
-    
-    const date = new Date(year, month, day, hour, minute, second)
-    return date.getTime()
+    return undefined
   } catch (e) {
-    console.warn('Failed to parse Chinese date string:', dateStr, e)
+    console.warn('Failed to parse date string:', dateStr, e)
     return undefined
   }
 }
-
 /**
  * 添加和计算路由项
  * @param indexes 路由树
@@ -112,23 +90,30 @@ async function addRouteItem(indexes: ArticleTree[], path: string, upgradeIndex =
   const nameStartsAt = path.lastIndexOf('/') + 1
   const title = path.slice(nameStartsAt, suffixIndex)
   
-  // 读取文件内容以获取 frontmatter 中的创建时间
+  // 读取文件内容以获取 frontmatter 中的创建时间和修改时间
   let createdTime: number | undefined
+  let modifiedTime: number | undefined
   try {
     const content = fs.readFileSync(path, 'utf-8')
     const parsedContent = matter(content)
     if (parsedContent.data.created) {
       createdTime = parseChineseDateString(parsedContent.data.created)
     }
+    if (parsedContent.data['date modified']) {
+      modifiedTime = parseChineseDateString(parsedContent.data['date modified'])
+    }
   } catch (e) {
     console.warn('Failed to read frontmatter from', path, e)
   }
+  
+  // 如果没有从 frontmatter 读取到修改时间，则从 git log 获取
+  const gitLastUpdated = +await git.raw(['log', '-1', '--format=%at', path]) * 1000
   
   const item = {
     index: title,
     text: title,
     link: `/${path.slice(0, suffixIndex)}`,
-    lastUpdated: +await git.raw(['log', '-1', '--format=%at', path]) * 1000,
+    lastUpdated: modifiedTime || gitLastUpdated,
     created: createdTime,
   }
   const linkItems = item.link.split('/')

@@ -1,7 +1,7 @@
 ---
 share: "true"
-created: 星期二, 九月 9日 2025, 3:20:24 下午
-date modified: 星期六, 十一月 29日 2025, 6:31:22 晚上
+created: 2025年-09月-01日 03:20
+date modified: 2025年-12月-01日 20:00
 ---
 
 ## git 流程图![Pasted image 20250909161347](../img/Pasted%20image%2020250909161347.png)
@@ -18,7 +18,6 @@ date modified: 星期六, 十一月 29日 2025, 6:31:22 晚上
 ```
 
 ## 创建仓库 git init
-
 
 ![Pasted image 20250909165611](../img/Pasted%20image%2020250909165611.png)
 
@@ -58,7 +57,6 @@ date modified: 星期六, 十一月 29日 2025, 6:31:22 晚上
 ```
 	touch .gitignore %% 将不需要管理的文件写到文件里面 %%
 ```
-
 
 ## 提交到服务器
 ```
