@@ -1,7 +1,7 @@
 ---
 share: "true"
 created: 2025年-12月-09日 20:06
-date modified: 2025年-12月-09日 20:24
+date modified: 2025年-12月-11日 12:13
 ---
 
 ![](../../img/Pasted%20image%2020251209200745.png)
@@ -44,3 +44,64 @@ public class Network03 {
     }
 }
 ```
+
+# UDP的三种通信方式
+
+![](../../img/Pasted%20image%2020251211111903.png)
+
+## 组播
+
+```Java
+//发送端
+public class Network06 {
+    public static void main(String[] args) throws IOException {
+        //创建MulticastSocket对象
+        MulticastSocket ms = new MulticastSocket();
+        //创建DatagramPacket对象
+        String str = "hello world";
+        byte[] bytes = str.getBytes();
+        InetAddress address = InetAddress.getByName("224.0.1.1");
+        int port = 10000;
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length,address,port);
+        //调用MulticastSocket的send方法发送DatagramPacket对象
+        ms.send(dp);
+
+        ms.close();
+    }
+}
+
+//两个接收端
+public class Network07 {
+    public static void main(String[] args) throws IOException {
+        MulticastSocket ms = new MulticastSocket(10000);
+        InetAddress address = InetAddress.getByName("224.0.1.1");
+        ms.joinGroup(address);
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length);
+        ms.receive(dp);
+        byte[] data = dp.getData();
+        int len = dp.getLength();
+        String str = new String(data,0,len);
+        System.out.println(str);
+        ms.close();
+    }
+}
+
+public class Network08 {
+    public static void main(String[] args) throws IOException {
+        MulticastSocket ms = new MulticastSocket(10000);
+        InetAddress address = InetAddress.getByName("224.0.1.1");
+        ms.joinGroup(address);
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length);
+        ms.receive(dp);
+        byte[] data = dp.getData();
+        int len = dp.getLength();
+        String str = new String(data,0,len);
+        System.out.println(str);
+        ms.close();
+    }
+}
+```
+## 广播
+就是将单播的地址改为255.255.255.255
