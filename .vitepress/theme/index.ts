@@ -80,7 +80,7 @@ const ExtendedTheme: Theme = {
         h(NolebaseEnhancedReadabilitiesScreenMenu),
       ],
       'sidebar-nav-before': () => [
-        // h(CustomSidebar),
+        h(CustomSidebar),
       ],
     })
   },
@@ -156,6 +156,10 @@ const ExtendedTheme: Theme = {
     })
   },
   setup() {
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.add('custom-sidebar-enabled')
+    }
+
     // Get frontmatter and route
     const { frontmatter } = toRefs(useData());
     const route = useRoute();

@@ -124,18 +124,12 @@ onMounted(() => {
 
 <style scoped>
 .custom-sidebar {
-  position: fixed;
-  top: var(--vp-nav-height);
-  bottom: 0;
-  left: 0;
-  z-index: var(--vp-z-index-sidebar);
-  width: var(--vp-sidebar-width);
-  background-color: var(--vp-c-bg);
-  border-right: 1px solid var(--vp-c-divider);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--vp-c-bg-alt, var(--vp-c-bg));
   display: flex;
   flex-direction: column;
-  transform: translateX(0);
-  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .sidebar-sort-control {
@@ -144,10 +138,11 @@ onMounted(() => {
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background-color: var(--vp-c-bg-soft);
+  background-color: var(--vp-c-bg-alt, var(--vp-c-bg));
   border-bottom: 1px solid var(--vp-c-divider);
-  position: relative;
-  z-index: 20;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .sort-label {
@@ -190,7 +185,8 @@ onMounted(() => {
 .sort-select:focus {
   outline: none;
   border-color: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 3px var(--vp-c-brand-soft);
+  box-shadow: 0 0 0 0 transparent;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent);
 }
 
 .sidebar-content {
@@ -229,19 +225,7 @@ html.dark .sort-select {
 /* 响应式设计 - 移动端 */
 @media (max-width: 960px) {
   .custom-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: var(--vp-z-index-local-nav);
-    padding-top: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px));
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-  }
-
-  .custom-sidebar.open {
-    transform: translateX(0);
+    height: auto;
   }
 
   .sidebar-sort-control {

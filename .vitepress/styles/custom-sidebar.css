@@ -1,19 +1,20 @@
-/* 隐藏默认侧边栏并调整自定义侧边栏样式 */
+/*
+  自定义侧边栏样式（可选）
 
-/* 隐藏默认侧边栏的导航内容 */
-.VPSidebar .VPSidebarNav {
+  之前这里直接隐藏了 VitePress 默认侧边栏（.VPSidebarNav / .group），
+  但当前主题里自定义侧边栏 `CustomSidebar` 并未挂载，导致左侧目录为空白。
+
+  如需启用自定义侧边栏：
+  - 在页面根元素上加 `html.custom-sidebar-enabled`（或在主题 Layout 中注入 CustomSidebar 并同时加该 class）
+  - 并确保 CustomSidebar 可见（不要把它渲染到被隐藏的容器里）
+*/
+
+html.custom-sidebar-enabled .VPSidebar .VPSidebarNav {
+  /* keep container visible so injected custom sidebar renders */
+}
+
+html.custom-sidebar-enabled .VPSidebar .group {
   display: none !important;
 }
 
-/* 隐藏默认侧边栏组 */
-.VPSidebar .group {
-  display: none !important;
-}
-
-/* 响应式处理 - 确保在移动端也能正常工作 */
-@media (max-width: 960px) {
-  /* 自定义侧边栏在移动端的显示 */
-  body.sidebar-open .custom-sidebar {
-    transform: translateX(0) !important;
-  }
-}
+/* 移动端侧边栏开合由 VitePress 默认行为处理，自定义侧边栏跟随即可 */

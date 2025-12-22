@@ -130,20 +130,22 @@ const indentStyle = computed(() => ({
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 6px 12px 6px 0;
+  padding: 6px 10px;
   border: none;
+  border-radius: 8px;
   background: transparent;
   color: var(--vp-c-text-1);
   font-size: 14px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition: color 0.25s;
+  transition: background-color 0.2s ease, color 0.2s ease;
   user-select: none;
 }
 
 .group-title:hover {
   color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-bg-soft);
 }
 
 .collapse-icon {
@@ -173,17 +175,18 @@ const indentStyle = computed(() => ({
 
 .group-items {
   margin: 4px 0;
+  padding: 2px 0 2px 0;
 }
 
 .sidebar-link {
   display: block;
-  padding: 6px 12px;
+  padding: 6px 10px;
   color: var(--vp-c-text-2);
   font-size: 14px;
   font-weight: 400;
   text-decoration: none;
-  transition: color 0.25s, background-color 0.25s;
-  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 8px;
   margin: 2px 0;
 }
 
@@ -195,7 +198,8 @@ const indentStyle = computed(() => ({
 .sidebar-link.is-active {
   color: var(--vp-c-brand-1);
   font-weight: 600;
-  background-color: var(--vp-c-brand-soft);
+  background-color: var(--vp-c-bg-soft);
+  box-shadow: inset 2px 0 0 0 var(--vp-c-brand-1);
 }
 
 .link-text {
@@ -203,15 +207,23 @@ const indentStyle = computed(() => ({
 }
 
 .sidebar-text {
-  padding: 6px 12px;
+  padding: 6px 10px;
   color: var(--vp-c-text-2);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
+  border-radius: 8px;
 }
 
 .text-content {
   opacity: 0.7;
+}
+
+/* 当前分组下包含激活项时的强调 */
+.sidebar-group.is-active > .group-title {
+  color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-bg-soft);
+  box-shadow: inset 2px 0 0 0 var(--vp-c-brand-1);
 }
 
 /* 响应式设计 */
