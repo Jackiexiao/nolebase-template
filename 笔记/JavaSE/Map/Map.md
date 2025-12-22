@@ -57,7 +57,7 @@ created: 2025年-10月-21日 21:08
 ```
 ## 用Lambda方式进行遍历
 > [!NOTE] 
-> 	使用(集合名).forEach(new BigConsumer<String,String>())
+> 	使用(集合名).forEach(new `BigConsumer<String,String>`())
 > 	底层：
 > 	forEach其实是利用第二种方式进行遍历，依次得到每一个键和值
 > 	再调用accept方法

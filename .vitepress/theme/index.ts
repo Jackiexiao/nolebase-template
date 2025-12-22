@@ -80,7 +80,7 @@ const ExtendedTheme: Theme = {
         h(NolebaseEnhancedReadabilitiesScreenMenu),
       ],
       'sidebar-nav-before': () => [
-        h(CustomSidebar),
+        // h(CustomSidebar),
       ],
     })
   },
@@ -96,11 +96,11 @@ const ExtendedTheme: Theme = {
     app.component('DocFooter', DocFooter)
     app.component('PageTitle', PageTitle)
     app.component('Share', Share)
-    app.component('TocList', TocList)
+    // app.component('TocList', TocList)
     app.component('AppContainer', AppContainer)
     app.component('NolebaseUnlazyImg', NolebaseUnlazyImg)
-    app.component('CustomSidebar', CustomSidebar)
-    app.component('CustomSidebarItem', CustomSidebarItem)
+    // app.component('CustomSidebar', CustomSidebar)
+    // app.component('CustomSidebarItem', CustomSidebarItem)
 
     app.provide(NolebaseEnhancedReadabilitiesInjectionKey, {
       layoutSwitch: {
