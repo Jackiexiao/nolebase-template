@@ -568,8 +568,14 @@ onMounted(() => {
 }
 
 .collapsed-date.selected {
-  background-color: var(--vp-c-brand);
-  color: white;
+  background-color: var(--vp-c-brand-3);
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 55%, transparent);
+  color: #fff;
+}
+
+.collapsed-date.range-start.range-end {
+  background-color: var(--vp-c-brand-3) !important;
+  color: #fff !important;
 }
 
 .collapsed-date.range-start {
@@ -657,8 +663,20 @@ onMounted(() => {
 }
 
 .calendar-day.selected {
-  background-color: var(--vp-c-brand);
-  color: white;
+  background-color: var(--vp-c-brand-3);
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 55%, transparent);
+  color: #fff;
+}
+
+.calendar-day.range-start.range-end {
+  background-color: var(--vp-c-brand-3) !important;
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 60%, transparent) !important;
+  color: #fff !important;
+}
+
+.calendar-day.selected .day-number,
+.collapsed-date.selected .collapsed-day-number {
+  font-weight: 700;
 }
 
 .calendar-day.range-start {
@@ -690,6 +708,14 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--vp-c-bg) 92%, transparent);
+}
+
+.calendar-day.selected .update-marker,
+.collapsed-date.selected .collapsed-update-marker {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.92),
+    0 0 0 3px rgba(0, 0, 0, 0.08);
 }
 
 .filter-status {

@@ -1,6 +1,6 @@
 <!-- 自定义侧边栏项组件（递归） -->
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useRoute } from 'vitepress'
 import type { ArticleTree } from '../../../scripts/types/metadata'
 
@@ -15,6 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const route = useRoute()
 const isCollapsed = ref(props.item.collapsed ?? true)
+const closeScreen = inject<() => void>('close-screen', () => {})
 
 // 检查是否有子项
 const hasChildren = computed(() => {
@@ -54,6 +55,10 @@ function toggleCollapse() {
 const indentStyle = computed(() => ({
   paddingLeft: `${props.depth * 12 + 12}px`
 }))
+
+function handleNavigate() {
+  closeScreen()
+}
 </script>
 
 <template>
@@ -102,6 +107,7 @@ const indentStyle = computed(() => ({
       class="sidebar-link"
       :class="{ 'is-active': isActive }"
       :style="indentStyle"
+      @click="handleNavigate"
     >
       <span class="link-text">{{ item.text }}</span>
     </a>

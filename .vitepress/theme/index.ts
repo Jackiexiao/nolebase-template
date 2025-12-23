@@ -37,6 +37,7 @@ import { creators } from '../creators'
 
 import AppContainer from './components/AppContainer.vue'
 import DocFooter from './components/DocFooter.vue'
+import DashboardHome from './components/DashboardHome.vue'
 import HomePage from './components/HomePage.vue'
 import PageTitle from './components/PageTitle.vue'
 import Share from './components/Share.vue'
@@ -78,6 +79,9 @@ const ExtendedTheme: Theme = {
       ],
       'nav-screen-content-after': () => [
         h(NolebaseEnhancedReadabilitiesScreenMenu),
+        h('div', { class: 'vp-navscreen-sidebar' }, [
+          h(CustomSidebar),
+        ]),
       ],
       'sidebar-nav-before': () => [
         h(CustomSidebar),
@@ -93,6 +97,7 @@ const ExtendedTheme: Theme = {
      */
 
     app.component('HomePage', HomePage)
+    app.component('DashboardHome', DashboardHome)
     app.component('DocFooter', DocFooter)
     app.component('PageTitle', PageTitle)
     app.component('Share', Share)

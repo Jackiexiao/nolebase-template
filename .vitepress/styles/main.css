@@ -4,6 +4,128 @@ html, body {
   -webkit-tap-highlight-color: transparent; /* 避免触屏下的点击高亮颜色 */
 }
 
+/**
+ * Global Dashboard Skin
+ * -------------------------------------------------------------------------- */
+
+html {
+  background:
+    radial-gradient(1100px 520px at 14% 10%, var(--dash-glow-a), transparent 66%),
+    radial-gradient(920px 560px at 86% 0%, var(--dash-glow-b), transparent 64%),
+    linear-gradient(110deg, rgba(10, 30, 36, 0.06), transparent 54%),
+    repeating-linear-gradient(135deg, var(--dash-grid) 0 1px, transparent 1px 12px),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--vp-c-bg) 88%, white),
+      color-mix(in oklab, var(--vp-c-bg) 96%, black)
+    );
+  background-attachment: fixed;
+}
+
+.dark html {
+  background:
+    radial-gradient(980px 520px at 14% 10%, var(--dash-glow-a), transparent 68%),
+    radial-gradient(900px 560px at 86% 0%, var(--dash-glow-b), transparent 66%),
+    linear-gradient(110deg, rgba(255, 255, 255, 0.03), transparent 54%),
+    repeating-linear-gradient(135deg, var(--dash-grid) 0 1px, transparent 1px 12px),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--vp-c-bg) 90%, black),
+      color-mix(in oklab, var(--vp-c-bg) 82%, black)
+    );
+}
+
+/* 顶部导航：玻璃质感 + 边界线 */
+.VPNav {
+  background: transparent !important;
+  border-bottom: 0;
+}
+
+.VPNav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--dash-backdrop);
+  border-bottom: 1px solid var(--dash-line);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.VPNavBar {
+  background: transparent !important;
+}
+
+/* 移动端：确保顶部导航可交互（避免某些移动端浏览器下出现点击穿透） */
+.VPNav,
+.VPNavBar,
+.VPNavBar .container,
+.VPNavBarHamburger {
+  pointer-events: auto !important;
+}
+
+/* 移动端：三横线打开的 NavScreen 里也显示侧边栏目录 */
+.VPNavScreen {
+  z-index: var(--vp-z-index-sidebar);
+}
+
+.VPNavScreen .container {
+  max-width: min(560px, 100%);
+}
+
+.vp-navscreen-sidebar {
+  margin-top: 20px;
+  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 16px;
+}
+
+/* 侧边栏：更贴近首页卡片语言 */
+.VPSidebar {
+  background:
+    radial-gradient(520px 360px at 8% 0%, var(--dash-glow-b), transparent 70%),
+    radial-gradient(520px 360px at 92% 18%, var(--dash-glow-a), transparent 72%),
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--dash-grid) 65%, transparent) 0 1px,
+      transparent 1px 12px
+    ),
+    color-mix(in oklab, var(--dash-backdrop) 86%, transparent) !important;
+  border-right: 1px solid var(--dash-line);
+  backdrop-filter: blur(12px);
+}
+
+/* 页面内容区域：卡片化容器（VPPage/VPDoc） */
+.VPPage > .container,
+.VPDoc > .container {
+  max-width: var(--dash-max);
+}
+
+.VPPage > .container > .content {
+  border: 1px solid var(--dash-line);
+  border-radius: 26px;
+  background: color-mix(in oklab, var(--dash-surface) 78%, transparent);
+  box-shadow: var(--dash-shadow);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.VPDoc > .container > .content-container {
+  border: 1px solid var(--dash-line);
+  border-radius: 26px;
+  background: color-mix(in oklab, var(--dash-surface) 78%, transparent);
+  box-shadow: var(--dash-shadow);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+@media (max-width: 960px) {
+  .VPPage > .container > .content,
+  .VPDoc > .container > .content-container {
+    border-radius: 18px;
+  }
+}
+
 /* 隐藏主页的贡献者部分 */
 .content .main .vp-doc h2[id="meet-the-team"],
 .content .main .vp-doc .VPTeamMembers {
@@ -365,7 +487,6 @@ body, html {
 .VPDoc .content-container,
 .VPDoc .container,
 .vp-doc {
-  max-width: 100%;
   overflow-x: hidden;
   word-wrap: break-word;
   overflow-wrap: break-word;

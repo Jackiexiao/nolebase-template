@@ -27,17 +27,17 @@
  * -------------------------------------------------------------------------- */
 
 :root {
-  --vp-c-sky-1: #3c96ca;
-  --vp-c-sky-2: #49a1d4;
-  --vp-c-sky-3: #49a1d4;
-  --vp-c-sky-soft: rgba(73, 161, 212, 0.84);
+  --vp-c-sky-1: #115e59;
+  --vp-c-sky-2: #0d9488;
+  --vp-c-sky-3: #0f766e;
+  --vp-c-sky-soft: rgba(13, 148, 136, 0.14);
 }
 
 .dark {
-  --vp-c-sky-1: #49a3d7;
-  --vp-c-sky-2: #58b1e5;
-  --vp-c-sky-3: #58b1e5;
-  --vp-c-sky-soft: #58b1e5;
+  --vp-c-sky-1: #5eead4;
+  --vp-c-sky-2: #2dd4bf;
+  --vp-c-sky-3: #14b8a6;
+  --vp-c-sky-soft: rgba(94, 234, 212, 0.16);
 }
 
 /**
@@ -77,13 +77,13 @@
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: -webkit-linear-gradient(
     120deg,
-    #8d6fc7 40%,
-    #4fc4d8
+    var(--dash-accent-b) 20%,
+    var(--dash-accent-a)
   );
   --vp-home-hero-image-background-image: linear-gradient(
     -45deg,
-    #8d73bf90 30%,
-    #d6c0e890
+    color-mix(in oklab, var(--dash-accent-b) 34%, transparent) 30%,
+    color-mix(in oklab, var(--dash-accent-a) 34%, transparent)
   );
   --vp-home-hero-image-filter: blur(30px);
 }
@@ -117,4 +117,43 @@
 
 :root {
   --vp-nolebase-highlight-targeted-heading-bg: rgba(253, 216, 95, 0.31);
+}
+
+/**
+ * Dashboard Skin (Global)
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --dash-max: 1180px;
+
+  --dash-accent-a: #14b8a6;
+  --dash-accent-b: #0ea5e9;
+
+  --dash-glow-a: color-mix(in oklab, var(--dash-accent-a) 18%, transparent);
+  --dash-glow-b: color-mix(in oklab, var(--dash-accent-b) 18%, transparent);
+  --dash-grid: rgba(0, 0, 0, 0.06);
+
+  --dash-line: color-mix(in oklab, var(--vp-c-divider) 72%, transparent);
+  --dash-surface: color-mix(in oklab, var(--vp-c-bg) 92%, white);
+  --dash-surface-2: color-mix(in oklab, var(--vp-c-bg) 86%, white);
+  --dash-backdrop: color-mix(in oklab, var(--vp-c-bg) 72%, transparent);
+
+  --dash-shadow: 0 18px 60px rgba(0, 0, 0, 0.08);
+  --dash-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+  --dash-accent-a: #2dd4bf;
+  --dash-accent-b: #38bdf8;
+
+  --dash-glow-a: color-mix(in oklab, var(--dash-accent-a) 14%, transparent);
+  --dash-glow-b: color-mix(in oklab, var(--dash-accent-b) 14%, transparent);
+  --dash-grid: rgba(255, 255, 255, 0.06);
+
+  --dash-surface: color-mix(in oklab, var(--vp-c-bg) 88%, black);
+  --dash-surface-2: color-mix(in oklab, var(--vp-c-bg) 82%, black);
+  --dash-backdrop: color-mix(in oklab, var(--vp-c-bg) 64%, transparent);
+
+  --dash-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+  --dash-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.42);
 }
