@@ -19,6 +19,13 @@ type Coords = {
   lon: number
 }
 
+type ReverseGeocodeResponse = {
+  city?: string
+  locality?: string
+  principalSubdivision?: string
+  countryName?: string
+}
+
 const env = (import.meta as any).env || {}
 const defaultLocation: Coords = {
   name: env.VITE_WEATHER_CITY || '武汉',
@@ -36,6 +43,8 @@ const weather = ref<WeatherData>({
 const weatherError = ref('')
 const isWeatherLoading = ref(false)
 const hasGeoTried = ref(false)
+const resolvedGeoName = ref('')
+const isGeoNameLoading = ref(false)
 
 const quickLinks = [
   { label: 'INBOX', desc: '收集灵感', href: '/笔记/' },
@@ -85,6 +94,41 @@ function mapWeatherCode(code: number) {
   return '天气'
 }
 
+function formatResolvedPlace(payload: ReverseGeocodeResponse) {
+  const city = payload.city?.trim()
+  const locality = payload.locality?.trim()
+  const province = payload.principalSubdivision?.trim()
+
+  const parts = [city, locality]
+    .filter(Boolean)
+    .filter((part, index, arr) => arr.indexOf(part) === index)
+
+  if (parts.length > 0) return parts.join(' · ')
+  return province || ''
+}
+
+async function fetchResolvedPlaceName(lat: number, lon: number) {
+  if (typeof fetch === 'undefined') return
+  isGeoNameLoading.value = true
+
+  try {
+    const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`
+    const res = await fetch(url, { cache: 'no-cache' })
+    if (!res.ok)
+      throw new Error(`HTTP ${res.status}`)
+
+    const payload = (await res.json()) as ReverseGeocodeResponse
+    resolvedGeoName.value = formatResolvedPlace(payload)
+  }
+  catch (error) {
+    console.warn('[reverse-geocode]', error)
+    resolvedGeoName.value = ''
+  }
+  finally {
+    isGeoNameLoading.value = false
+  }
+}
+
 async function fetchWeather(coords: Coords = defaultLocation) {
   if (typeof fetch === 'undefined') return
   isWeatherLoading.value = true
@@ -119,23 +163,42 @@ async function fetchWeather(coords: Coords = defaultLocation) {
   }
 }
 
-function tryGeolocation() {
-  if (hasGeoTried.value || typeof navigator === 'undefined' || !navigator.geolocation)
-    return
+function formatGeoError(error: GeolocationPositionError) {
+  if (error.code === error.PERMISSION_DENIED)
+    return '定位权限被拒绝，可在浏览器权限设置中开启'
+  if (error.code === error.POSITION_UNAVAILABLE)
+    return '无法获取位置信息（系统定位服务关闭或不可用）'
+  if (error.code === error.TIMEOUT)
+    return '定位超时，请稍后重试'
+  return error.message || '无法获取定位，使用默认城市'
+}
 
-  hasGeoTried.value = true
+function tryGeolocation(force = false) {
+  if (!force && hasGeoTried.value) return
+  if (typeof navigator === 'undefined' || !navigator.geolocation) {
+    weatherError.value = weatherError.value || '当前环境不支持定位，使用默认城市'
+    return
+  }
+
+  if (!force)
+    hasGeoTried.value = true
+
   navigator.geolocation.getCurrentPosition(
     (pos) => {
+      resolvedGeoName.value = ''
       fetchWeather({
         name: '当前位置',
         lat: pos.coords.latitude,
         lon: pos.coords.longitude,
       })
+      fetchResolvedPlaceName(pos.coords.latitude, pos.coords.longitude)
     },
-    () => {
-      weatherError.value = weatherError.value || '无法获取定位，使用默认城市'
+    (error) => {
+      isGeoNameLoading.value = false
+      resolvedGeoName.value = ''
+      weatherError.value = weatherError.value || formatGeoError(error)
     },
-    { enableHighAccuracy: false, timeout: 5000 },
+    { enableHighAccuracy: false, timeout: 8000 },
   )
 }
 
@@ -208,7 +271,11 @@ onBeforeUnmount(() => {
 
           <div class="widget weather">
             <div class="weather-row">
-              <div class="weather-city">{{ weather.city }}</div>
+              <div class="weather-city">
+                <span>{{ weather.city }}</span>
+                <span v-if="resolvedGeoName" class="weather-place">{{ resolvedGeoName }}</span>
+                <span v-else-if="isGeoNameLoading" class="weather-place loading">定位中…</span>
+              </div>
               <div v-if="weatherError" class="weather-pill warn">
                 <span class="weather-dot" aria-hidden="true" />
                 <span>获取失败</span>
@@ -222,7 +289,7 @@ onBeforeUnmount(() => {
             <div class="weather-meta">
               <span v-if="weather.wind" class="meta-pill">{{ weather.wind }}</span>
               <span v-if="weather.time" class="meta-pill subtle">更新 {{ weather.time }}</span>
-              <button class="geo" type="button" @click="tryGeolocation">
+              <button class="geo" type="button" @click="tryGeolocation(true)">
                 用定位更新
               </button>
             </div>
@@ -573,6 +640,23 @@ onBeforeUnmount(() => {
 .weather-city {
   font-weight: 750;
   color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.weather-place {
+  font-weight: 650;
+  font-size: 12px;
+  color: color-mix(in oklab, var(--muted) 82%, var(--brand));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weather-place.loading {
+  opacity: 0.7;
 }
 
 .weather-pill {
