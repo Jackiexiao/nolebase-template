@@ -8,15 +8,15 @@ import fg from 'fast-glob'
 import Git from 'simple-git'
 import matter from 'gray-matter'
 import uniq from 'lodash/uniq'
-import TagsAlias from '../.vitepress/docsTagsAlias.json'
+import TagsAlias from '../docs/.vitepress/docsTagsAlias.json'
 import type { ArticleTree, DocsMetadata, DocsTagsAlias, Tag } from './types/metadata'
 
-const dir = './'
-const target = '笔记/'
+const dir = './docs'
+const target = 'note/'
 const folderTop = true
 
 export const DIR_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-export const DIR_VITEPRESS = resolve(dirname(fileURLToPath(import.meta.url)), '../.vitepress')
+export const DIR_VITEPRESS = resolve(dirname(fileURLToPath(import.meta.url)), '../docs/.vitepress')
 
 const git = Git(DIR_ROOT)
 
@@ -64,7 +64,7 @@ async function addRouteItem(indexes: ArticleTree[], path: string, upgradeIndex =
     index: title,
     text: title,
     link: `/${path.slice(0, suffixIndex)}`,
-    lastUpdated: +await git.raw(['log', '-1', '--format=%at', path]) * 1000,
+    lastUpdated: +await git.raw(['log', '-1', '--format=%at', join(dir, path)]) * 1000,
   }
   const linkItems = item.link.split('/')
   linkItems.shift()
@@ -298,7 +298,7 @@ async function processDocs(docs: string[], docsMetadata: DocsMetadata) {
     })
 
     // 读取源文件
-    const content = fs.readFileSync(docPath, 'utf-8')
+    const content = fs.readFileSync(join(dir, docPath), 'utf-8')
     // 解析 Markdown 文件的 frontmatter
     const parsedPageContent = matter(content)
 

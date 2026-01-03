@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: 正式 Production - GitHub Pages
-      url: https://nolebase.github.io/nolebase
+      url: https://example.com
     steps:
       - name: 签出代码
         uses: actions/checkout@v3
@@ -62,6 +62,5 @@ jobs:
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: .vitepress/dist
+          FOLDER: docs/.vitepress/dist
         uses: JamesIves/github-pages-deploy-action@v4
-

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: 正式 Production
-      url: https://nolebase.ayaka.io
+      url: https://example.com
     steps:
       - name: 签出代码
         uses: actions/checkout@v3
@@ -61,8 +61,7 @@ jobs:
 
       - name: 推送到 Netlify
         timeout-minutes: 10
-        run: netlify deploy --dir .vitepress/dist --prod
+        run: netlify deploy --dir docs/.vitepress/dist --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-

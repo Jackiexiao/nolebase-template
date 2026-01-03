@@ -1,35 +1,33 @@
 {
-  "name": "nolebase",
+  "name": "vitepress-template",
   "type": "module",
   "version": "1.0.0",
   "author": {
-    "name": "Nólëbase",
-    "email": "nolebase@ayaka.moe",
-    "url": "https://github.com/nolebase"
+    "name": "VitePress Template"
   },
   "license": "MIT",
   "keywords": [
     "vitepress",
-    "nolebase",
     "markdown",
-    "nolebase-integration",
     "obsidian",
     "knowledge-base",
-    "vitepress-doc"
+    "vitepress-doc",
+    "template"
   ],
   "scripts": {
-    "dev": "pnpm run docs:dev",
-    "build": "pnpm run docs:build",
-    "serve": "pnpm run docs:serve",
-    "docs:dev": "pnpm run update && vitepress dev",
-    "docs:build": "pnpm run update && vitepress build",
-    "docs:serve": "vitepress serve",
+    "dev": "npm run docs:dev",
+    "build": "npm run docs:build",
+    "serve": "npm run docs:serve",
+    "docs:dev": "npm run update && vitepress dev docs",
+    "docs:build": "npm run update && vitepress build docs",
+    "docs:serve": "vitepress serve docs",
     "update": "tsx scripts/update.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.12.2",
     "@iconify-json/eos-icons": "^1.1.10",
+    "@iconify-json/icon-park-outline": "^1.2.4",
     "@iconify-json/ic": "^1.1.17",
     "@iconify-json/octicon": "^1.1.53",
     "@iconify-json/svg-spinners": "^1.1.2",
