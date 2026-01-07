@@ -5,11 +5,13 @@ import Inspect from 'vite-plugin-inspect'
 
 import { GitChangelog, GitChangelogMarkdownSection } from '@nolebase/vitepress-plugin-git-changelog/vite'
 import { PageProperties, PagePropertiesMarkdownSection } from '@nolebase/vitepress-plugin-page-properties/vite'
-import { ThumbnailHashImages } from '@nolebase/vitepress-plugin-thumbnail-hash/vite'
 
 import { githubRepoLink } from './metadata'
+import { ThumbnailHashImagesPatched } from './scripts/vite/thumbnail-hash-images'
 
 export default defineConfig(async () => {
+  const enableInspect = process.env.VITE_INSPECT === '1'
+
   return {
     assetsInclude: ['**/*.mov'],
     optimizeDeps: {
@@ -17,10 +19,11 @@ export default defineConfig(async () => {
       // This needs to be excluded from optimization
       exclude: [
         'vitepress',
+        '@nolebase/vitepress-plugin-thumbnail-hash/client',
       ],
     },
     plugins: [
-      Inspect(),
+      ...(enableInspect ? [Inspect()] : []),
       GitChangelog({
         repoURL: () => githubRepoLink,
       }),
@@ -43,7 +46,7 @@ export default defineConfig(async () => {
           'index.md',
         ],
       }),
-      ThumbnailHashImages(),
+      ThumbnailHashImagesPatched(),
       Components({
         include: [/\.vue$/, /\.md$/],
         dirs: '.vitepress/theme/components',
@@ -56,6 +59,7 @@ export default defineConfig(async () => {
         '@nolebase/vitepress-plugin-enhanced-readabilities',
         '@nolebase/vitepress-plugin-highlight-targeted-heading',
         '@nolebase/vitepress-plugin-inline-link-preview',
+        '@nolebase/vitepress-plugin-thumbnail-hash',
       ],
     },
   }

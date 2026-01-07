@@ -78,6 +78,37 @@ function parseChineseDateString(dateStr: string): number | undefined {
     return undefined
   }
 }
+
+type FrontmatterTimes = {
+  createdTime?: number
+  modifiedTime?: number
+}
+
+async function getGitLastUpdatedMsByPath(targetPath: string, onlyPaths?: Set<string>) {
+  const updated = new Map<string, number>()
+  const output = await git.raw(['log', '--name-only', '--pretty=format:%at', '--', targetPath])
+  const lines = output.split('\n')
+
+  let currentCommitMs: number | undefined
+  for (const rawLine of lines) {
+    const line = rawLine.trim()
+    if (!line) continue
+
+    if (/^\d{9,}$/.test(line)) {
+      currentCommitMs = Number(line) * 1000
+      continue
+    }
+
+    if (!currentCommitMs) continue
+    if (!line.endsWith('.md')) continue
+    if (onlyPaths && !onlyPaths.has(line)) continue
+    if (updated.has(line)) continue
+
+    updated.set(line, currentCommitMs)
+  }
+
+  return updated
+}
 /**
  * 添加和计算路由项
  * @param indexes 路由树
@@ -85,35 +116,25 @@ function parseChineseDateString(dateStr: string): number | undefined {
  * @param upgradeIndex 是否升级 index
  * @returns 路由树
  */
-async function addRouteItem(indexes: ArticleTree[], path: string, upgradeIndex = false) {
+async function addRouteItem(
+  indexes: ArticleTree[],
+  path: string,
+  times: FrontmatterTimes | undefined,
+  gitLastUpdatedMs: number | undefined,
+  upgradeIndex = false,
+) {
   const suffixIndex = path.lastIndexOf('.')
   const nameStartsAt = path.lastIndexOf('/') + 1
   const title = path.slice(nameStartsAt, suffixIndex)
-  
-  // 读取文件内容以获取 frontmatter 中的创建时间和修改时间
-  let createdTime: number | undefined
-  let modifiedTime: number | undefined
-  try {
-    const content = fs.readFileSync(path, 'utf-8')
-    const parsedContent = matter(content)
-    if (parsedContent.data.created) {
-      createdTime = parseChineseDateString(parsedContent.data.created)
-    }
-    if (parsedContent.data['date modified']) {
-      modifiedTime = parseChineseDateString(parsedContent.data['date modified'])
-    }
-  } catch (e) {
-    console.warn('Failed to read frontmatter from', path, e)
-  }
-  
-  // 如果没有从 frontmatter 读取到修改时间，则从 git log 获取
-  const gitLastUpdated = +await git.raw(['log', '-1', '--format=%at', path]) * 1000
-  
+
+  const createdTime = times?.createdTime
+  const modifiedTime = times?.modifiedTime
+
   const item = {
     index: title,
     text: title,
     link: `/${path.slice(0, suffixIndex)}`,
-    lastUpdated: modifiedTime || gitLastUpdated,
+    lastUpdated: modifiedTime || gitLastUpdatedMs || 0,
     created: createdTime,
   }
   const linkItems = item.link.split('/')
@@ -174,17 +195,6 @@ function addRouteItemRecursion(indexes: ArticleTree[], item: any, path: string[]
 
     return indexes
   }
-}
-
-/**
- * 处理 docsMetadata.sidebar，拼接 sidebar 路由树
- * @param docs 符合 glob 的文件列表
- * @param docsMetadata docsMetadata.json 的内容
- */
-async function processSidebar(docs: string[], docsMetadata: DocsMetadata) {
-  await Promise.all(docs.map(async (docPath: string) => {
-    await addRouteItem(docsMetadata.sidebar, docPath)
-  }))
 }
 
 /**
@@ -338,6 +348,7 @@ async function processDocs(docs: string[], docsMetadata: DocsMetadata) {
   if (!docsMetadata.docs)
     docsMetadata.docs = []
 
+  const timesByPath = new Map<string, FrontmatterTimes>()
   const tagsToBeProcessed: { doc: string, tags: string[] }[] = []
 
   docsMetadata.docs = docs.map((docPath) => {
@@ -352,6 +363,14 @@ async function processDocs(docs: string[], docsMetadata: DocsMetadata) {
     const content = fs.readFileSync(docPath, 'utf-8')
     // 解析 Markdown 文件的 frontmatter
     const parsedPageContent = matter(content)
+
+    const createdTime = parsedPageContent.data.created
+      ? parseChineseDateString(parsedPageContent.data.created)
+      : undefined
+    const modifiedTime = parsedPageContent.data['date modified']
+      ? parseChineseDateString(parsedPageContent.data['date modified'])
+      : undefined
+    timesByPath.set(docPath, { createdTime, modifiedTime })
 
     if (Array.isArray(parsedPageContent.data.tags)) {
       if (parsedPageContent.data.tags.includes(null))
@@ -390,6 +409,8 @@ async function processDocs(docs: string[], docsMetadata: DocsMetadata) {
   await Promise.all(tagsToBeProcessed.map(async ({ doc, tags }) => {
     await processTags(doc, docsMetadata, tags)
   }))
+
+  return timesByPath
 }
 
 async function run() {
@@ -400,11 +421,23 @@ async function run() {
 
   const docsMetadata: DocsMetadata = { docs: [], sidebar: [], tags: [] }
 
-  await processDocs(docs, docsMetadata)
+  const timesByPath = await processDocs(docs, docsMetadata)
   console.log('processed docs in', `${(new Date()).getTime() - now}ms`)
   now = (new Date()).getTime()
 
-  await processSidebar(docs, docsMetadata)
+  const docsSet = new Set(docs)
+  const lastUpdatedByPath = await getGitLastUpdatedMsByPath(target, docsSet)
+  console.log('processed git timestamps in', `${(new Date()).getTime() - now}ms`)
+  now = (new Date()).getTime()
+
+  await Promise.all(docs.map(async (docPath: string) => {
+    await addRouteItem(
+      docsMetadata.sidebar,
+      docPath,
+      timesByPath.get(docPath),
+      lastUpdatedByPath.get(docPath),
+    )
+  }))
   console.log('processed sidebar in', `${(new Date()).getTime() - now}ms`)
   now = (new Date()).getTime()
 

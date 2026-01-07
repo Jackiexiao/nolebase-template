@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { withBase } from 'vitepress'
-import { VPTeamMembers } from 'vitepress/theme'
 import { creators } from '../../creators'
 import { siteDescription, siteName } from '../../../metadata'
 
@@ -45,6 +44,14 @@ const isWeatherLoading = ref(false)
 const hasGeoTried = ref(false)
 const resolvedGeoName = ref('')
 const isGeoNameLoading = ref(false)
+const isLowPowerMode = ref(false)
+const showCreators = ref(false)
+
+const shouldAutoLoadWeather = computed(() => !isLowPowerMode.value)
+
+const VPTeamMembers = defineAsyncComponent(() =>
+  import('vitepress/theme').then(module => module.VPTeamMembers),
+)
 
 const quickLinks = [
   { label: 'INBOX', desc: '收集灵感', href: '/笔记/' },
@@ -61,11 +68,11 @@ const tools = [
 ] as const
 
 function formatTime(value: Date) {
-  return value.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return timeFormatter.value.format(value)
 }
 
 function formatDate(value: Date) {
-  return value.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+  return dateFormatter.value.format(value)
 }
 
 function updateGreeting(value: Date) {
@@ -107,13 +114,71 @@ function formatResolvedPlace(payload: ReverseGeocodeResponse) {
   return province || ''
 }
 
+const timeFormatter = computed(() => {
+  if (typeof Intl === 'undefined')
+    return { format: (date: Date) => date.toLocaleTimeString('zh-CN') }
+
+  if (isLowPowerMode.value)
+    return new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit' })
+
+  return new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+})
+
+const dateFormatter = computed(() => {
+  if (typeof Intl === 'undefined')
+    return { format: (date: Date) => date.toLocaleDateString('zh-CN') }
+
+  return new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+})
+
+const WEATHER_CACHE_KEY = 'dash:weather:v1'
+const WEATHER_CACHE_TTL_MS = 30 * 60 * 1000
+
+type WeatherCache = {
+  savedAt: number
+  payload: WeatherData
+}
+
+function readWeatherCache(): WeatherData | undefined {
+  if (typeof localStorage === 'undefined') return
+
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY)
+    if (!raw) return
+    const parsed = JSON.parse(raw) as WeatherCache
+    if (!parsed?.savedAt || !parsed?.payload) return
+    if (Date.now() - parsed.savedAt > WEATHER_CACHE_TTL_MS) return
+    return parsed.payload
+  }
+  catch {
+    return
+  }
+}
+
+function writeWeatherCache(payload: WeatherData) {
+  if (typeof localStorage === 'undefined') return
+
+  try {
+    const record: WeatherCache = { savedAt: Date.now(), payload }
+    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(record))
+  }
+  catch {
+    // ignore
+  }
+}
+
+let weatherAbort: AbortController | undefined
+let geoAbort: AbortController | undefined
+
 async function fetchResolvedPlaceName(lat: number, lon: number) {
   if (typeof fetch === 'undefined') return
   isGeoNameLoading.value = true
 
   try {
+    geoAbort?.abort()
+    geoAbort = new AbortController()
     const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`
-    const res = await fetch(url, { cache: 'no-cache' })
+    const res = await fetch(url, { cache: 'force-cache', signal: geoAbort.signal })
     if (!res.ok)
       throw new Error(`HTTP ${res.status}`)
 
@@ -135,8 +200,10 @@ async function fetchWeather(coords: Coords = defaultLocation) {
   weatherError.value = ''
 
   try {
+    weatherAbort?.abort()
+    weatherAbort = new AbortController()
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current_weather=true&timezone=Asia/Shanghai`
-    const res = await fetch(url, { cache: 'no-cache' })
+    const res = await fetch(url, { cache: 'no-cache', signal: weatherAbort.signal })
 
     if (!res.ok)
       throw new Error(`HTTP ${res.status}`)
@@ -146,15 +213,19 @@ async function fetchWeather(coords: Coords = defaultLocation) {
     if (!current)
       throw new Error('missing current_weather')
 
-    weather.value = {
+    const nextWeather: WeatherData = {
       city: coords.name,
       text: mapWeatherCode(current.weathercode),
       temperature: `${Math.round(current.temperature)}°C`,
       wind: `风速 ${Math.round(current.windspeed)} km/h`,
       time: current.time,
     }
+    weather.value = nextWeather
+    writeWeatherCache(nextWeather)
   }
   catch (error) {
+    if ((error as any)?.name === 'AbortError')
+      return
     console.error('[weather]', error)
     weatherError.value = '天气获取失败，已使用默认占位'
   }
@@ -205,17 +276,39 @@ function tryGeolocation(force = false) {
 let timer: number | undefined
 
 onMounted(() => {
+  const matches = (query: string) => window.matchMedia?.(query)?.matches ?? false
+  showCreators.value = !matches('(max-width: 640px)')
+  isLowPowerMode.value = Boolean(
+    matches('(max-width: 640px)')
+    || matches('(prefers-reduced-motion: reduce)')
+    || (navigator as any)?.connection?.saveData,
+  )
+
   greeting.value = updateGreeting(now.value)
-  fetchWeather(defaultLocation)
-  tryGeolocation()
+  const cached = readWeatherCache()
+  if (cached)
+    weather.value = cached
+
+  const loadWeather = () => fetchWeather(defaultLocation)
+  if (shouldAutoLoadWeather.value) {
+    if ('requestIdleCallback' in window) {
+      ;(window as any).requestIdleCallback(loadWeather, { timeout: 1200 })
+    }
+    else {
+      window.setTimeout(loadWeather, 220)
+    }
+  }
+
   timer = window.setInterval(() => {
     now.value = new Date()
     greeting.value = updateGreeting(now.value)
-  }, 1000)
+  }, isLowPowerMode.value ? 60_000 : 1000)
 })
 
 onBeforeUnmount(() => {
   if (timer) window.clearInterval(timer)
+  weatherAbort?.abort()
+  geoAbort?.abort()
 })
 </script>
 
@@ -289,12 +382,21 @@ onBeforeUnmount(() => {
             <div class="weather-meta">
               <span v-if="weather.wind" class="meta-pill">{{ weather.wind }}</span>
               <span v-if="weather.time" class="meta-pill subtle">更新 {{ weather.time }}</span>
+              <button
+                v-if="!isWeatherLoading && !shouldAutoLoadWeather"
+                class="geo"
+                type="button"
+                @click="fetchWeather(defaultLocation)"
+              >
+                加载天气
+              </button>
               <button class="geo" type="button" @click="tryGeolocation(true)">
                 用定位更新
               </button>
             </div>
             <div class="weather-hint">
               <span v-if="isWeatherLoading">正在拉取天气数据...</span>
+              <span v-else-if="!shouldAutoLoadWeather">已启用轻量模式：移动端默认不自动请求外部接口。</span>
               <span v-else-if="weatherError">{{ weatherError }}</span>
               <span v-else>数据来自 open-meteo.com，可通过环境变量 VITE_WEATHER_LAT/LON/CITY 指定默认城市。</span>
             </div>
@@ -348,7 +450,15 @@ onBeforeUnmount(() => {
           <div class="card-title">创作者</div>
           <div class="card-kicker">一起维护这片知识花园。</div>
           <div class="team">
-            <VPTeamMembers size="small" :members="creators" />
+            <button
+              v-if="!showCreators"
+              class="reveal"
+              type="button"
+              @click="showCreators = true"
+            >
+              点击展开
+            </button>
+            <VPTeamMembers v-else size="small" :members="creators" />
           </div>
         </div>
       </div>
@@ -879,6 +989,21 @@ onBeforeUnmount(() => {
   margin-top: 10px;
 }
 
+.reveal {
+  width: 100%;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  color: var(--ink);
+  font-weight: 680;
+  cursor: pointer;
+}
+
+.reveal:hover {
+  border-color: color-mix(in oklab, var(--brand) 26%, var(--line));
+}
+
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -905,6 +1030,46 @@ onBeforeUnmount(() => {
 
   .hero-right {
     grid-template-columns: 1fr;
+  }
+
+  .clock-ring {
+    display: none;
+  }
+
+  .hero-cover {
+    background:
+      radial-gradient(540px 260px at 18% 20%, color-mix(in oklab, var(--brand) 14%, transparent), transparent 66%),
+      radial-gradient(480px 300px at 92% 24%, color-mix(in oklab, var(--brand-2) 14%, transparent), transparent 70%),
+      linear-gradient(120deg, rgba(10, 30, 36, 0.05), transparent 60%);
+  }
+
+  .brand,
+  .quick,
+  .widget,
+  .btn.ghost,
+  .meta-pill,
+  .chip {
+    backdrop-filter: none;
+  }
+
+  .btn:hover,
+  .quick:hover,
+  .list-item:hover,
+  .chip:hover,
+  .geo:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (hover: none) {
+  .btn:hover,
+  .quick:hover,
+  .list-item:hover,
+  .chip:hover,
+  .geo:hover {
+    transform: none;
+    box-shadow: none;
   }
 }
 </style>

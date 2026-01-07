@@ -19,6 +19,12 @@ pnpm docs:dev # dev模式,本地查看文档
 pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepress/dist 下, 保证在本地能构建成功后再发布比较好
 ```
 
+补充说明：
+- `pnpm docs:dev` / `pnpm docs:build` 会先执行 `pnpm run update`，用于生成/刷新 `.vitepress/docsMetadata.json`（侧边栏、标签、更新时间等）。
+- 需要排查依赖/样式问题时可启用 Vite Inspect：`VITE_INSPECT=1 pnpm docs:dev`（默认关闭以减少构建与启动开销）。
+- 首页在移动端默认启用轻量模式：不自动请求天气/定位、创作者列表按需展开，用于降低首屏卡顿与外部请求带来的阻塞。
+- 如需在构建产物里生成每页 Open Graph 图片：`VITEPRESS_OG_IMAGE=1 pnpm docs:build`（默认关闭以提升构建速度）。
+
 需要修改的内容：
 - 可以修改 metadata/index.ts 配置一下自己的网站信息
 - 再修改一下 index.md 配置一下首页
@@ -67,4 +73,3 @@ giscus 利用了 [GitHub Discussions](https://docs.github.com/en/discussions) 
 - https://github.com/oleeskild/obsidian-digital-garden
 - https://github.com/ObsidianPublisher/obsidian-github-publisher
 - https://github.com/alangrainger/share-note
-

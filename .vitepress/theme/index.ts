@@ -1,8 +1,8 @@
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import giscusTalk from 'vitepress-plugin-comment-with-giscus';
-import { useData, useRoute } from 'vitepress';
-import { toRefs } from "vue";
+import giscusTalk from 'vitepress-plugin-comment-with-giscus'
+import { useData, useRoute } from 'vitepress'
+import { toRefs } from 'vue'
 import { h } from 'vue'
 
 import {
@@ -41,9 +41,7 @@ import DashboardHome from './components/DashboardHome.vue'
 import HomePage from './components/HomePage.vue'
 import PageTitle from './components/PageTitle.vue'
 import Share from './components/Share.vue'
-import TocList from './components/TocList.vue'
 import CustomSidebar from './components/CustomSidebar.vue'
-import CustomSidebarItem from './components/CustomSidebarItem.vue'
 
 import '@nolebase/vitepress-plugin-enhanced-readabilities/client/style.css'
 import '@nolebase/vitepress-plugin-highlight-targeted-heading/client/style.css'
@@ -58,8 +56,6 @@ import 'virtual:uno.css'
 import '../styles/main.css'
 import '../styles/vars.css'
 import '../styles/custom-sidebar.css'
-
-import('@nolebase/vitepress-plugin-inline-link-preview/client')
 
 const ExtendedTheme: Theme = {
   extends: DefaultTheme,
@@ -101,11 +97,9 @@ const ExtendedTheme: Theme = {
     app.component('DocFooter', DocFooter)
     app.component('PageTitle', PageTitle)
     app.component('Share', Share)
-    // app.component('TocList', TocList)
     app.component('AppContainer', AppContainer)
     app.component('NolebaseUnlazyImg', NolebaseUnlazyImg)
     // app.component('CustomSidebar', CustomSidebar)
-    // app.component('CustomSidebarItem', CustomSidebarItem)
 
     app.provide(NolebaseEnhancedReadabilitiesInjectionKey, {
       layoutSwitch: {
@@ -166,8 +160,8 @@ const ExtendedTheme: Theme = {
     }
 
     // Get frontmatter and route
-    const { frontmatter } = toRefs(useData());
-    const route = useRoute();
+    const { frontmatter } = toRefs(useData())
+    const route = useRoute()
     
     // Obtain configuration from: https://giscus.app/
     giscusTalk({

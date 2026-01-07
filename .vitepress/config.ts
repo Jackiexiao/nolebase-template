@@ -251,11 +251,13 @@ export default defineConfig({
     },
   },
   async buildEnd(siteConfig) {
-    await buildEndGenerateOpenGraphImages({
-      baseUrl: targetDomain,
-      category: {
-        byLevel: 2,
-      },
-    })(siteConfig)
+    if (process.env.VITEPRESS_OG_IMAGE === '1') {
+      await buildEndGenerateOpenGraphImages({
+        baseUrl: targetDomain,
+        category: {
+          byLevel: 2,
+        },
+      })(siteConfig)
+    }
   },
 })
