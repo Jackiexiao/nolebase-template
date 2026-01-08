@@ -2,7 +2,7 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import giscusTalk from 'vitepress-plugin-comment-with-giscus'
 import { useData, useRoute } from 'vitepress'
-import { toRefs } from 'vue'
+import { toRefs, watch } from 'vue'
 import { h } from 'vue'
 
 import {
@@ -155,43 +155,81 @@ const ExtendedTheme: Theme = {
     })
   },
   setup() {
-    if (typeof document !== 'undefined') {
+    if (typeof document !== 'undefined')
       document.documentElement.classList.add('custom-sidebar-enabled')
-    }
 
     // Get frontmatter and route
     const { frontmatter } = toRefs(useData())
     const route = useRoute()
     
-    // Obtain configuration from: https://giscus.app/
-    giscusTalk({
-      repo: 'Jackiexiao/nolebase-template',
-      repoId: 'R_kgDOL5WHsg',
-      category: 'Announcements', // default: `General`
-      categoryId: 'DIC_kwDOL5WHss4CfTYs',
-      mapping: 'url', // default: `pathname`
-      inputPosition: 'top', // default: `top`
-      lang: 'zh-CN', // default: `zh-CN`
-      // i18n setting (Note: This configuration will override the default language set by lang)
-      // Configured as an object with key-value pairs inside:
-      // [your i18n configuration name]: [corresponds to the language pack name in Giscus]
-      locales: {
+    if (typeof window === 'undefined')
+      return
+
+    const matches = (query: string) => window.matchMedia?.(query)?.matches ?? false
+    const isLowPowerMode = Boolean(
+      matches('(max-width: 640px)')
+      || matches('(prefers-reduced-motion: reduce)')
+      || (navigator as any)?.connection?.saveData,
+    )
+
+    const initGiscus = () => {
+      // Skip homepage: reduce JS/network overhead for first paint on mobile.
+      if (route.path === '/' || route.path === '/index.html')
+        return
+
+      // Obtain configuration from: https://giscus.app/
+      giscusTalk({
+        repo: 'Jackiexiao/nolebase-template',
+        repoId: 'R_kgDOL5WHsg',
+        category: 'Announcements', // default: `General`
+        categoryId: 'DIC_kwDOL5WHss4CfTYs',
+        mapping: 'url', // default: `pathname`
+        inputPosition: 'top', // default: `top`
+        lang: 'zh-CN', // default: `zh-CN`
+        // i18n setting (Note: This configuration will override the default language set by lang)
+        // Configured as an object with key-value pairs inside:
+        // [your i18n configuration name]: [corresponds to the language pack name in Giscus]
+        locales: {
           'zh-Hans': 'zh-CN',
-          'en-US': 'en'
+          'en-US': 'en',
+        },
+        homePageShowComment: false, // Whether to display the comment area on the homepage, the default is false
+        lightTheme: 'light', // default: `light`
+        darkTheme: 'transparent_dark', // default: `transparent_dark`
+        // ...
+      }, {
+        frontmatter, route,
       },
-      homePageShowComment: false, // Whether to display the comment area on the homepage, the default is false
-      lightTheme: 'light', // default: `light`
-      darkTheme: 'transparent_dark', // default: `transparent_dark`
-      // ...
-    }, {
-      frontmatter, route
-    },
-      // Whether to activate the comment area on all pages.
-      // The default is true, which means enabled, this parameter can be ignored;
-      // If it is false, it means it is not enabled.
-      // You can use `comment: true` preface to enable it separately on the page.
-      true
-    );
+        // Whether to activate the comment area on all pages.
+        // The default is true, which means enabled, this parameter can be ignored;
+        // If it is false, it means it is not enabled.
+        // You can use `comment: true` preface to enable it separately on the page.
+        true,
+      )
+    }
+
+    let scheduled = false
+    const scheduleInit = () => {
+      if (scheduled) return
+      scheduled = true
+
+      if (isLowPowerMode && 'requestIdleCallback' in window) {
+        ;(window as any).requestIdleCallback(initGiscus, { timeout: 2500 })
+      }
+      else {
+        window.setTimeout(initGiscus, isLowPowerMode ? 800 : 120)
+      }
+    }
+
+    watch(
+      () => route.path,
+      (path) => {
+        if (path === '/' || path === '/index.html')
+          return
+        scheduleInit()
+      },
+      { immediate: true },
+    )
   }
 }
 

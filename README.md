@@ -24,6 +24,7 @@ pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepres
 - 需要排查依赖/样式问题时可启用 Vite Inspect：`VITE_INSPECT=1 pnpm docs:dev`（默认关闭以减少构建与启动开销）。
 - 首页在移动端默认启用轻量模式：不自动请求天气/定位、创作者列表按需展开，用于降低首屏卡顿与外部请求带来的阻塞。
 - 如需在构建产物里生成每页 Open Graph 图片：`VITEPRESS_OG_IMAGE=1 pnpm docs:build`（默认关闭以提升构建速度）。
+- 图片 ThumbHash（更好的图片占位与渐进加载）会写入 `.vitepress/cache` 并做增量复用；如需临时跳过以提升本地构建/启动速度：`VITEPRESS_THUMB_HASH=0 pnpm docs:dev` / `VITEPRESS_THUMB_HASH=0 pnpm docs:build`。
 
 需要修改的内容：
 - 可以修改 metadata/index.ts 配置一下自己的网站信息

@@ -25,8 +25,13 @@ type ThumbHash = ThumbHashCalculated & {
   assetUrlWithBase: string
 }
 
+type ThumbHashCacheEntry = ThumbHash & {
+  assetSize: number
+  assetMtimeMs: number
+}
+
 function normalizeBase64(base64: string) {
-  return base64.replace('/', '_').replace('+', '-').replace('=', '-')
+  return base64.replaceAll('/', '_').replaceAll('+', '-').replaceAll('=', '-')
 }
 
 function hashSha256Base64(data: Uint8Array) {
@@ -77,15 +82,25 @@ export function ThumbnailHashImagesPatched(): Plugin {
 
       await mkdir(cacheDir, { recursive: true })
 
-      try {
-        const existing = await stat(mapPath)
-        if (Date.now() - existing.mtimeMs < 2 * 60 * 1000) {
-          console.log(`${spinnerPrefix} Done. (skipped, fresh cache found)`)
-          return
+      const enabled = process.env.VITEPRESS_THUMB_HASH !== '0' && process.env.VITEPRESS_THUMB_HASH !== 'false'
+      if (!enabled) {
+        try {
+          await stat(mapPath)
         }
+        catch {
+          await writeFile(mapPath, '{}')
+        }
+        console.log(`${spinnerPrefix} Skipped. (VITEPRESS_THUMB_HASH=0)`)
+        return
+      }
+
+      let existingMap: Record<string, ThumbHashCacheEntry> = {}
+      try {
+        const raw = await readFile(mapPath, 'utf8')
+        existingMap = JSON.parse(raw) as Record<string, ThumbHashCacheEntry>
       }
       catch {
-        // ignore
+        existingMap = {}
       }
 
       console.log(`${spinnerPrefix} Prepare to generate hashes for images...`)
@@ -101,16 +116,43 @@ export function ThumbnailHashImagesPatched(): Plugin {
         ],
       })
 
-      const thumbhashMap: Record<string, ThumbHash> = {}
+      const canonicalMap: Record<string, ThumbHashCacheEntry> = {}
+      let reusedCount = 0
+      let generatedCount = 0
 
       for (const file of files) {
+        const assetFileName = normalizePath(relative(root, file))
+        const fileStat = await stat(file)
+        const existing = existingMap[assetFileName]
+
+        if (
+          existing
+          && existing.assetMtimeMs === fileStat.mtimeMs
+          && existing.assetSize === fileStat.size
+        ) {
+          const reused: ThumbHashCacheEntry = {
+            ...existing,
+            assetFileName,
+            assetFullFileName: normalizePath(file),
+            assetUrl: normalizePath(join(vitepressConfig.assetsDir, assetFileName)),
+            assetUrlWithBase: normalizePath(join(vitepressConfig.site.base, vitepressConfig.assetsDir, assetFileName)),
+            assetMtimeMs: fileStat.mtimeMs,
+            assetSize: fileStat.size,
+          }
+          if (!reused.assetUrlWithBase.startsWith('/'))
+            reused.assetUrlWithBase = `/${reused.assetUrlWithBase}`
+
+          canonicalMap[assetFileName] = reused
+          reusedCount++
+          continue
+        }
+
         const readImageRawData = await readFile(file)
         const assetFullHashRaw = normalizeBase64(hashSha256Base64(readImageRawData))
         const assetFileHash = assetFullHashRaw.substring(0, 10)
         const calculated = await calculateThumbHashForFile(readImageRawData)
 
-        const assetFileName = normalizePath(relative(root, file))
-        const thumbhashData: ThumbHash = {
+        const thumbhashData: ThumbHashCacheEntry = {
           ...calculated,
           assetFileName,
           assetFullFileName: normalizePath(file),
@@ -118,11 +160,19 @@ export function ThumbnailHashImagesPatched(): Plugin {
           assetFileHash,
           assetUrl: normalizePath(join(vitepressConfig.assetsDir, assetFileName)),
           assetUrlWithBase: normalizePath(join(vitepressConfig.site.base, vitepressConfig.assetsDir, assetFileName)),
+          assetMtimeMs: fileStat.mtimeMs,
+          assetSize: fileStat.size,
         }
 
         if (!thumbhashData.assetUrlWithBase.startsWith('/'))
           thumbhashData.assetUrlWithBase = `/${thumbhashData.assetUrlWithBase}`
 
+        canonicalMap[assetFileName] = thumbhashData
+        generatedCount++
+      }
+
+      const thumbhashMap: Record<string, ThumbHashCacheEntry> = {}
+      for (const [assetFileName, thumbhashData] of Object.entries(canonicalMap)) {
         const encodedAssetFileName = assetFileName.replace(/ /g, '%20')
 
         thumbhashMap[assetFileName] = thumbhashData
@@ -141,7 +191,7 @@ export function ThumbnailHashImagesPatched(): Plugin {
       }
 
       await writeFile(mapPath, JSON.stringify(thumbhashMap, null, 2))
-      console.log(`${spinnerPrefix} Done. (${files.length} images)`)
+      console.log(`${spinnerPrefix} Done. (${files.length} images, ${reusedCount} cached, ${generatedCount} generated)`)
     },
   }
 }

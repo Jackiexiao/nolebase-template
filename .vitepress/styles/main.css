@@ -35,6 +35,43 @@ html {
     );
 }
 
+@media (max-width: 640px), (prefers-reduced-motion: reduce), (prefers-reduced-data: reduce) {
+  html {
+    background:
+      radial-gradient(720px 420px at 18% 12%, var(--dash-glow-a), transparent 72%),
+      radial-gradient(640px 440px at 82% 0%, var(--dash-glow-b), transparent 74%),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--vp-c-bg) 92%, white),
+        color-mix(in oklab, var(--vp-c-bg) 96%, black)
+      );
+    background-attachment: scroll;
+  }
+
+  .dark html {
+    background:
+      radial-gradient(680px 420px at 18% 12%, var(--dash-glow-a), transparent 74%),
+      radial-gradient(620px 440px at 82% 0%, var(--dash-glow-b), transparent 76%),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--vp-c-bg) 90%, black),
+        color-mix(in oklab, var(--vp-c-bg) 84%, black)
+      );
+  }
+
+  .VPNav::before,
+  .VPSidebar,
+  .VPPage > .container > .content,
+  .VPDoc > .container > .content-container {
+    backdrop-filter: none;
+  }
+
+  .VPPage > .container > .content,
+  .VPDoc > .container > .content-container {
+    box-shadow: none;
+  }
+}
+
 /* 顶部导航：玻璃质感 + 边界线 */
 .VPNav {
   background: transparent !important;
@@ -206,7 +243,7 @@ html {
   src: url(/tengwar-annatar-glaemscrafu.woff2) format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 /* 标题所需要的字体 */
@@ -215,7 +252,7 @@ html {
   src: url(/tengwar-annatar-glaemscrafu-bold.woff2) format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 /* 首页标题样式 */
