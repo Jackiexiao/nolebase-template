@@ -8,5 +8,7 @@
     "silent": false,
     "autoAlias": true
   },
-  "buildCommand": "pnpm run build"
+  "installCommand": "corepack pnpm@9.15.3 install --frozen-lockfile --prod=false",
+  "buildCommand": "corepack pnpm@9.15.3 run docs:build",
+  "outputDirectory": ".vitepress/dist"
 }

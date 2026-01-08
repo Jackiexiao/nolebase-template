@@ -2,6 +2,10 @@
   "name": "nolebase",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.15.3",
+  "engines": {
+    "node": ">=20"
+  },
   "author": {
     "name": "fenglingblogs",
     "email": "nolebase@ayaka.moe",

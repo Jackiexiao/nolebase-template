@@ -33,7 +33,16 @@ pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepres
 
 ## 部署
 ### vercel 部署
-vercel 部署很简单, 在 vercel 中选择项目后, 修改构建的 output directory 为 .vitepress/dist 就行了（默认是 ./dist）
+vercel 部署很简单，直接在 Vercel 中导入本仓库即可（本仓库已在 `vercel.json` 中将 output directory 设置为 `.vitepress/dist`）。
+
+本仓库已在 `vercel.json` 中配置：
+- `installCommand`: `corepack pnpm@9.15.3 install --frozen-lockfile --prod=false`（避免 `NODE_ENV=production` 导致 devDependencies 未安装，从而缺失 `tsx/vitepress`）
+- `buildCommand`: `corepack pnpm@9.15.3 run docs:build`
+- `outputDirectory`: `.vitepress/dist`
+
+如果你在 Vercel 仍遇到 `ELIFECYCLE` / `Command "pnpm run build" exited with 1`：
+- 优先检查构建日志里是否有 `tsx: not found` / `vitepress: not found`；若有，说明安装阶段未包含 devDependencies（确保 installCommand 含 `--prod=false`）。
+- 确保 Vercel 使用 Node.js 20+（本仓库在 `package.json` 中声明了 `engines.node`）。
 
 如果你选择了用 vercel 部署，可以关闭 netflify 的 workflow.
 
