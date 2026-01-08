@@ -947,6 +947,7 @@ watch(
   position: relative;
   border-radius: 18px;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .board::before {
@@ -960,8 +961,16 @@ watch(
   pointer-events: none;
 }
 
-.top,
-.toolbar,
+.top {
+  position: relative;
+  z-index: 2;
+}
+
+.toolbar {
+  position: relative;
+  z-index: 3;
+}
+
 .content {
   position: relative;
   z-index: 1;
@@ -1221,8 +1230,8 @@ watch(
   background:
     radial-gradient(520px 220px at 14% 0%, color-mix(in oklab, var(--accent-b) 14%, transparent), transparent 70%),
     radial-gradient(520px 220px at 86% 0%, color-mix(in oklab, var(--accent-a) 12%, transparent), transparent 72%),
-    color-mix(in oklab, var(--surface) 64%, transparent);
-  backdrop-filter: blur(16px);
+    color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px) saturate(1.08);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.18);
   max-height: min(240px, calc(100vh - 220px));
   overflow: auto;
