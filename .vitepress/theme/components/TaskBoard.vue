@@ -32,6 +32,18 @@ const search = ref('')
 const statusFilter = ref<TaskStatus | 'all'>('all')
 const showDone = ref(true)
 
+const statusRoot = ref<HTMLElement | null>(null)
+const statusMenuEl = ref<HTMLElement | null>(null)
+const statusTriggerEl = ref<HTMLButtonElement | null>(null)
+const isStatusMenuOpen = ref(false)
+const statusActiveIndex = ref(-1)
+const statusOptions = [
+  { value: 'all', label: '全部' },
+  { value: 'todo', label: '待办' },
+  { value: 'doing', label: '进行中' },
+  { value: 'done', label: '已完成' },
+] as const
+
 const tasks = ref<Task[]>([])
 
 const isEditorOpen = ref(false)
@@ -54,6 +66,10 @@ const counts = computed(() => {
     acc[task.status] += 1
   }
   return acc
+})
+
+const currentStatusLabel = computed(() => {
+  return statusOptions.find(option => option.value === statusFilter.value)?.label || '全部'
 })
 
 function nowIso() {
@@ -200,6 +216,88 @@ const boardColumns = computed(() => {
     columns[task.status].push(task)
   return columns
 })
+
+function openStatusMenu() {
+  isStatusMenuOpen.value = true
+  statusActiveIndex.value = Math.max(0, statusOptions.findIndex(option => option.value === statusFilter.value))
+  nextTick(() => statusMenuEl.value?.focus?.())
+}
+
+function closeStatusMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
+  isStatusMenuOpen.value = false
+  statusActiveIndex.value = -1
+  if (focusTrigger)
+    nextTick(() => statusTriggerEl.value?.focus?.())
+}
+
+function toggleStatusMenu() {
+  if (isStatusMenuOpen.value)
+    closeStatusMenu()
+  else
+    openStatusMenu()
+}
+
+function selectStatus(value: typeof statusOptions[number]['value']) {
+  statusFilter.value = value as any
+  closeStatusMenu({ focusTrigger: true })
+}
+
+function handleStatusTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && isStatusMenuOpen.value) {
+    event.preventDefault()
+    closeStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    toggleStatusMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    openStatusMenu()
+    const currentIndex = statusOptions.findIndex(option => option.value === statusFilter.value)
+    if (event.key === 'ArrowDown')
+      statusActiveIndex.value = Math.min(statusOptions.length - 1, Math.max(0, currentIndex) + 1)
+    else
+      statusActiveIndex.value = Math.max(0, (currentIndex >= 0 ? currentIndex : 0) - 1)
+  }
+}
+
+function handleStatusMenuKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Tab') {
+    closeStatusMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    const delta = event.key === 'ArrowDown' ? 1 : -1
+    const next = statusActiveIndex.value + delta
+    if (next < 0)
+      statusActiveIndex.value = statusOptions.length - 1
+    else if (next >= statusOptions.length)
+      statusActiveIndex.value = 0
+    else
+      statusActiveIndex.value = next
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    if (statusActiveIndex.value >= 0 && statusActiveIndex.value < statusOptions.length) {
+      event.preventDefault()
+      selectStatus(statusOptions[statusActiveIndex.value].value)
+    }
+  }
+}
 
 function resetEditor() {
   editor.title = ''
@@ -356,9 +454,18 @@ function importJson() {
 }
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && isEditorOpen.value)
+  if (event.key !== 'Escape') return
+
+  if (isStatusMenuOpen.value) {
+    closeStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (isEditorOpen.value)
     closeEditor()
 }
+
+let docPointerDownHandler: ((event: Event) => void) | null = null
 
 onMounted(() => {
   isClient.value = true
@@ -374,11 +481,27 @@ onMounted(() => {
 
   if (typeof window !== 'undefined')
     window.addEventListener('keydown', handleKeydown, { passive: true })
+
+  if (typeof document !== 'undefined') {
+    docPointerDownHandler = (event: Event) => {
+      if (!isStatusMenuOpen.value) return
+      const target = event.target as Node | null
+      if (!target) return
+      if (!statusRoot.value?.contains(target))
+        closeStatusMenu()
+    }
+    document.addEventListener('pointerdown', docPointerDownHandler, true)
+  }
 })
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined')
     window.removeEventListener('keydown', handleKeydown)
+
+  if (typeof document !== 'undefined' && docPointerDownHandler) {
+    document.removeEventListener('pointerdown', docPointerDownHandler, true)
+    docPointerDownHandler = null
+  }
 })
 
 watch(
@@ -442,15 +565,68 @@ watch(
         <input v-model="search" class="search-input" type="search" placeholder="搜索标题/备注…" />
       </label>
 
-      <label class="select">
+      <div ref="statusRoot" class="select" role="group" aria-label="状态筛选">
         <span class="select-label">状态</span>
-        <select v-model="statusFilter" class="select-input">
-          <option value="all">全部</option>
-          <option value="todo">待办</option>
-          <option value="doing">进行中</option>
-          <option value="done">已完成</option>
-        </select>
-      </label>
+        <button
+          ref="statusTriggerEl"
+          class="select-trigger"
+          type="button"
+          :aria-expanded="isStatusMenuOpen ? 'true' : 'false'"
+          aria-haspopup="listbox"
+          aria-label="筛选状态"
+          @click="toggleStatusMenu"
+          @keydown="handleStatusTriggerKeydown"
+        >
+          <span class="select-trigger-text">{{ currentStatusLabel }}</span>
+          <span class="select-trigger-chevron" :data-open="isStatusMenuOpen ? 'true' : 'false'" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+        </button>
+
+        <Transition name="filter-pop">
+          <div
+            v-show="isStatusMenuOpen"
+            ref="statusMenuEl"
+            class="select-menu"
+            role="listbox"
+            tabindex="-1"
+            @keydown="handleStatusMenuKeydown"
+          >
+            <button
+              v-for="(option, index) in statusOptions"
+              :key="option.value"
+              class="select-option"
+              type="button"
+              role="option"
+              :aria-selected="option.value === statusFilter ? 'true' : 'false'"
+              :data-active="index === statusActiveIndex ? 'true' : 'false'"
+              @mouseenter="statusActiveIndex = index"
+              @click="selectStatus(option.value)"
+            >
+              <span class="select-option-label">{{ option.label }}</span>
+              <span v-if="option.value === statusFilter" class="select-option-check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M20 6L9 17L4 12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </Transition>
+      </div>
 
       <label class="toggle">
         <input v-model="showDone" type="checkbox" />
@@ -957,6 +1133,7 @@ watch(
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  position: relative;
   border: 1px solid var(--line);
   background: color-mix(in oklab, var(--surface) 74%, transparent);
   height: 38px;
@@ -970,13 +1147,165 @@ watch(
   font-weight: 700;
 }
 
-.select-input {
+.select:focus-within {
+  border-color: color-mix(in oklab, var(--brand) 30%, var(--line));
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 12%, transparent);
+}
+
+.select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   border: 0;
   outline: none;
   background: transparent;
   color: var(--ink);
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 12px;
+  cursor: pointer;
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 760;
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.select-trigger:hover {
+  transform: translateY(-1px);
+}
+
+.select-trigger:active {
+  transform: translateY(0);
+}
+
+.select-trigger-text {
+  min-width: 78px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: color-mix(in oklab, var(--vp-c-text-1) 92%, transparent);
+}
+
+.select-trigger-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--surface-2) 78%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.select-trigger:hover .select-trigger-chevron {
+  color: var(--brand);
+  background: color-mix(in oklab, var(--surface-2) 92%, transparent);
+}
+
+.select-trigger-chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+.select-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 190px;
+  max-width: min(72vw, 240px);
+  border-radius: 14px;
+  padding: 6px;
+  border: 1px solid color-mix(in oklab, var(--brand) 12%, var(--line));
+  background:
+    radial-gradient(520px 220px at 14% 0%, color-mix(in oklab, var(--accent-b) 14%, transparent), transparent 70%),
+    radial-gradient(520px 220px at 86% 0%, color-mix(in oklab, var(--accent-a) 12%, transparent), transparent 72%),
+    color-mix(in oklab, var(--surface) 64%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.18);
+  max-height: min(240px, calc(100vh - 220px));
+  overflow: auto;
+  z-index: 10;
+}
+
+.select-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--vp-c-text-1);
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease, color 160ms ease;
+}
+
+.select-option:hover,
+.select-option[data-active="true"] {
+  background: color-mix(in oklab, var(--vp-c-bg) 40%, transparent);
+  border-color: color-mix(in oklab, var(--brand) 14%, transparent);
+}
+
+.select-option:active {
+  transform: translateY(1px);
+}
+
+.select-option[aria-selected="true"] {
+  background: color-mix(in oklab, var(--vp-c-brand-soft) 55%, transparent);
+  border-color: color-mix(in oklab, var(--brand) 22%, transparent);
+}
+
+.select-option-label {
+  min-width: 0;
+  text-align: left;
+}
+
+.select-option-check {
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--surface-2) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--brand) 16%, transparent);
+}
+
+.filter-pop-enter-active,
+.filter-pop-leave-active {
+  transition: opacity 160ms ease, transform 160ms ease, filter 160ms ease;
+}
+
+.filter-pop-enter-from,
+.filter-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-trigger,
+  .select-option {
+    transition: none;
+  }
+
+  .filter-pop-enter-active,
+  .filter-pop-leave-active {
+    transition: opacity 1ms linear;
+  }
+
+  .filter-pop-enter-from,
+  .filter-pop-leave-to {
+    transform: none;
+    filter: none;
+  }
 }
 
 .toggle {
