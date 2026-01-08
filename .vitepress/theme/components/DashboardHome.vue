@@ -3,6 +3,7 @@ import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 
 import { withBase } from 'vitepress'
 import { creators } from '../../creators'
 import { siteDescription, siteName } from '../../../metadata'
+import TaskBoard from './TaskBoard.vue'
 
 type WeatherData = {
   city: string
@@ -55,7 +56,7 @@ const VPTeamMembers = defineAsyncComponent(() =>
 
 const quickLinks = [
   { label: 'INBOX', desc: '收集灵感', href: '/笔记/' },
-  { label: '任务看板', desc: '推进进度', href: '/toc' },
+  { label: '任务看板', desc: '推进进度', href: '/#task-board' },
   { label: '书影空间', desc: '随手摘录', href: '/笔记/' },
   { label: '图书馆', desc: '主题索引', href: '/笔记/' },
 ] as const
@@ -405,30 +406,12 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="below">
-      <div class="cards">
-        <div class="card large">
-          <div class="card-title">今天要完成的任务</div>
-          <div class="card-kicker">把“想做”变成“已完成”。</div>
-          <div class="list">
-            <a class="list-item" :href="withBase('/toc')">
-              <span class="dot ok" aria-hidden="true" />
-              <span class="list-text">查看最近更新与目录</span>
-              <span class="list-meta">/toc</span>
-            </a>
-            <a class="list-item" :href="withBase('/笔记/')">
-              <span class="dot warn" aria-hidden="true" />
-              <span class="list-text">继续阅读：从“笔记”入口开始</span>
-              <span class="list-meta">/笔记/</span>
-            </a>
-            <a class="list-item" href="https://discord.gg/XuNFDcDZGj" target="_blank" rel="noreferrer">
-              <span class="dot info" aria-hidden="true" />
-              <span class="list-text">加入 Discord：交流与共建</span>
-              <span class="list-meta">discord.gg</span>
-            </a>
-          </div>
-        </div>
+    <section id="task-board" class="below">
+      <div class="card board-card">
+        <TaskBoard />
+      </div>
 
+      <div class="cards">
         <div class="card">
           <div class="card-title">常用工具</div>
           <div class="chips">
@@ -862,8 +845,13 @@ onBeforeUnmount(() => {
 
 .cards {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.board-card {
+  padding: 0;
+  margin-bottom: 14px;
 }
 
 .card {
