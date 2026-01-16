@@ -945,9 +945,14 @@ watch(
   --danger: #ef4444;
   --ok: #22c55e;
   position: relative;
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
   isolation: isolate;
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  background: linear-gradient(180deg,
+      color-mix(in oklab, var(--surface) 96%, white),
+      color-mix(in oklab, var(--surface-2) 86%, transparent));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
 
 .board::before {
@@ -955,9 +960,9 @@ watch(
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(900px 420px at 20% 10%, color-mix(in oklab, var(--accent-a) 16%, transparent), transparent 62%),
-    radial-gradient(800px 520px at 88% 0%, color-mix(in oklab, var(--accent-b) 16%, transparent), transparent 64%),
-    repeating-linear-gradient(135deg, var(--dash-grid) 0 1px, transparent 1px 14px);
+    radial-gradient(900px 420px at 20% 10%, color-mix(in oklab, var(--accent-a) 14%, transparent), transparent 62%),
+    radial-gradient(800px 520px at 88% 0%, color-mix(in oklab, var(--accent-b) 14%, transparent), transparent 64%),
+    repeating-linear-gradient(135deg, color-mix(in oklab, var(--dash-grid) 85%, transparent) 0 1px, transparent 1px 14px);
   pointer-events: none;
 }
 
@@ -1108,7 +1113,14 @@ watch(
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 0 14px 12px;
+  margin: 0 14px 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
+  background: color-mix(in oklab, var(--surface) 84%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 26px rgba(0, 0, 0, 0.06);
 }
 
 .search {
@@ -1377,7 +1389,12 @@ watch(
 }
 
 .content {
-  padding: 0 14px 14px;
+  margin: 0 14px 14px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .skeleton {
@@ -1494,8 +1511,10 @@ watch(
 .item-card {
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface) 72%, transparent);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg,
+      color-mix(in oklab, var(--surface) 82%, transparent),
+      color-mix(in oklab, var(--surface-2) 72%, transparent));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
   padding: 12px 12px 10px;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
@@ -1645,7 +1664,9 @@ watch(
 .col {
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  background: linear-gradient(160deg,
+      color-mix(in oklab, var(--surface) 82%, transparent),
+      color-mix(in oklab, var(--surface-2) 70%, transparent));
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -1685,7 +1706,9 @@ watch(
 .kcard {
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface-2) 78%, transparent);
+  background: linear-gradient(150deg,
+      color-mix(in oklab, var(--surface-2) 82%, transparent),
+      color-mix(in oklab, var(--surface) 72%, transparent));
   padding: 10px 10px 9px;
   cursor: grab;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
@@ -1751,8 +1774,11 @@ watch(
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: color-mix(in oklab, var(--vp-c-bg) 60%, rgba(0, 0, 0, 0.55));
-  backdrop-filter: blur(10px);
+  background:
+    radial-gradient(1200px 520px at 20% 20%, color-mix(in oklab, var(--accent-a) 18%, transparent), transparent 62%),
+    radial-gradient(900px 520px at 80% 10%, color-mix(in oklab, var(--accent-b) 16%, transparent), transparent 64%),
+    color-mix(in oklab, var(--vp-c-bg) 55%, rgba(0, 0, 0, 0.6));
+  backdrop-filter: blur(14px) saturate(1.08);
   display: grid;
   place-items: center;
   padding: 18px;
@@ -1761,10 +1787,12 @@ watch(
 
 .modal {
   width: min(720px, 96vw);
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface) 90%, var(--vp-c-bg));
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+  border-radius: 22px;
+  border: 1px solid color-mix(in oklab, var(--line) 78%, transparent);
+  background: linear-gradient(160deg,
+      color-mix(in oklab, var(--surface) 96%, white),
+      color-mix(in oklab, var(--surface-2) 86%, transparent));
+  box-shadow: 0 36px 120px rgba(0, 0, 0, 0.34);
   overflow: hidden;
 }
 
@@ -1773,15 +1801,17 @@ watch(
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 14px 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
   background: linear-gradient(135deg,
-      color-mix(in oklab, var(--accent-a) 10%, var(--surface)),
-      color-mix(in oklab, var(--accent-b) 10%, var(--surface)));
+      color-mix(in oklab, var(--accent-a) 14%, var(--surface)),
+      color-mix(in oklab, var(--accent-b) 14%, var(--surface)));
 }
 
 .modal-title {
+  font-size: 16px;
   font-weight: 880;
+  letter-spacing: 0.02em;
   color: var(--ink);
 }
 
@@ -1789,17 +1819,29 @@ watch(
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface) 76%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  background: color-mix(in oklab, var(--surface-2) 84%, transparent);
   color: var(--ink);
   font-size: 18px;
   cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.icon:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--brand) 28%, var(--line));
+  color: var(--brand);
+  background: color-mix(in oklab, var(--surface-2) 94%, transparent);
+}
+
+.icon:active {
+  transform: translateY(0);
 }
 
 .modal-body {
-  padding: 14px;
+  padding: 16px 18px 12px;
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .row {
@@ -1817,17 +1859,20 @@ watch(
   color: var(--muted);
   font-size: 12px;
   font-weight: 780;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .field-input {
-  border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface) 74%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 76%, transparent);
+  background: color-mix(in oklab, var(--vp-c-bg) 90%, white);
   color: var(--ink);
   border-radius: 14px;
   height: 38px;
   padding: 0 12px;
   font-size: 13px;
   outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
 .field-input.area {
@@ -1836,17 +1881,29 @@ watch(
   resize: vertical;
 }
 
+.field-input::placeholder {
+  color: color-mix(in oklab, var(--muted) 80%, transparent);
+}
+
 .field-input:focus {
   border-color: color-mix(in oklab, var(--brand) 34%, var(--line));
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 14%, transparent);
+  background: color-mix(in oklab, var(--vp-c-bg) 96%, white);
 }
 
 .modal-foot {
-  padding: 12px 14px 14px;
-  border-top: 1px solid var(--line);
+  padding: 12px 18px 16px;
+  border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  background: color-mix(in oklab, var(--surface-2) 78%, transparent);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.modal .btn {
+  height: 36px;
+  border-radius: 12px;
+  padding: 0 16px;
 }
 
 @media (max-width: 880px) {
