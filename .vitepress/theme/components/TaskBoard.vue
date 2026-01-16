@@ -44,6 +44,28 @@ const statusOptions = [
   { value: 'done', label: '已完成' },
 ] as const
 
+const modalStatusRoot = ref<HTMLElement | null>(null)
+const modalStatusMenuEl = ref<HTMLElement | null>(null)
+const modalStatusTriggerEl = ref<HTMLButtonElement | null>(null)
+const isModalStatusMenuOpen = ref(false)
+const modalStatusActiveIndex = ref(-1)
+const modalStatusOptions = [
+  { value: 'todo', label: '待办' },
+  { value: 'doing', label: '进行中' },
+  { value: 'done', label: '已完成' },
+] as const
+
+const modalPriorityRoot = ref<HTMLElement | null>(null)
+const modalPriorityMenuEl = ref<HTMLElement | null>(null)
+const modalPriorityTriggerEl = ref<HTMLButtonElement | null>(null)
+const isModalPriorityMenuOpen = ref(false)
+const modalPriorityActiveIndex = ref(-1)
+const modalPriorityOptions = [
+  { value: 'low', label: '低' },
+  { value: 'medium', label: '中' },
+  { value: 'high', label: '高' },
+] as const
+
 const tasks = ref<Task[]>([])
 
 const isEditorOpen = ref(false)
@@ -70,6 +92,14 @@ const counts = computed(() => {
 
 const currentStatusLabel = computed(() => {
   return statusOptions.find(option => option.value === statusFilter.value)?.label || '全部'
+})
+
+const modalStatusLabel = computed(() => {
+  return modalStatusOptions.find(option => option.value === editor.status)?.label || '待办'
+})
+
+const modalPriorityLabel = computed(() => {
+  return modalPriorityOptions.find(option => option.value === editor.priority)?.label || '中'
 })
 
 function nowIso() {
@@ -299,6 +329,172 @@ function handleStatusMenuKeydown(event: KeyboardEvent) {
   }
 }
 
+function openModalStatusMenu() {
+  isModalStatusMenuOpen.value = true
+  isModalPriorityMenuOpen.value = false
+  modalStatusActiveIndex.value = Math.max(0, modalStatusOptions.findIndex(option => option.value === editor.status))
+  nextTick(() => modalStatusMenuEl.value?.focus?.())
+}
+
+function closeModalStatusMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
+  isModalStatusMenuOpen.value = false
+  modalStatusActiveIndex.value = -1
+  if (focusTrigger)
+    nextTick(() => modalStatusTriggerEl.value?.focus?.())
+}
+
+function toggleModalStatusMenu() {
+  if (isModalStatusMenuOpen.value)
+    closeModalStatusMenu()
+  else
+    openModalStatusMenu()
+}
+
+function selectModalStatus(value: typeof modalStatusOptions[number]['value']) {
+  editor.status = value as TaskStatus
+  closeModalStatusMenu({ focusTrigger: true })
+}
+
+function handleModalStatusTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && isModalStatusMenuOpen.value) {
+    event.preventDefault()
+    closeModalStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    toggleModalStatusMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    openModalStatusMenu()
+    const currentIndex = modalStatusOptions.findIndex(option => option.value === editor.status)
+    if (event.key === 'ArrowDown')
+      modalStatusActiveIndex.value = Math.min(modalStatusOptions.length - 1, Math.max(0, currentIndex) + 1)
+    else
+      modalStatusActiveIndex.value = Math.max(0, (currentIndex >= 0 ? currentIndex : 0) - 1)
+  }
+}
+
+function handleModalStatusMenuKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeModalStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Tab') {
+    closeModalStatusMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    const delta = event.key === 'ArrowDown' ? 1 : -1
+    const next = modalStatusActiveIndex.value + delta
+    if (next < 0)
+      modalStatusActiveIndex.value = modalStatusOptions.length - 1
+    else if (next >= modalStatusOptions.length)
+      modalStatusActiveIndex.value = 0
+    else
+      modalStatusActiveIndex.value = next
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    if (modalStatusActiveIndex.value >= 0 && modalStatusActiveIndex.value < modalStatusOptions.length) {
+      event.preventDefault()
+      selectModalStatus(modalStatusOptions[modalStatusActiveIndex.value].value)
+    }
+  }
+}
+
+function openModalPriorityMenu() {
+  isModalPriorityMenuOpen.value = true
+  isModalStatusMenuOpen.value = false
+  modalPriorityActiveIndex.value = Math.max(0, modalPriorityOptions.findIndex(option => option.value === editor.priority))
+  nextTick(() => modalPriorityMenuEl.value?.focus?.())
+}
+
+function closeModalPriorityMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
+  isModalPriorityMenuOpen.value = false
+  modalPriorityActiveIndex.value = -1
+  if (focusTrigger)
+    nextTick(() => modalPriorityTriggerEl.value?.focus?.())
+}
+
+function toggleModalPriorityMenu() {
+  if (isModalPriorityMenuOpen.value)
+    closeModalPriorityMenu()
+  else
+    openModalPriorityMenu()
+}
+
+function selectModalPriority(value: typeof modalPriorityOptions[number]['value']) {
+  editor.priority = value as TaskPriority
+  closeModalPriorityMenu({ focusTrigger: true })
+}
+
+function handleModalPriorityTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && isModalPriorityMenuOpen.value) {
+    event.preventDefault()
+    closeModalPriorityMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    toggleModalPriorityMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    openModalPriorityMenu()
+    const currentIndex = modalPriorityOptions.findIndex(option => option.value === editor.priority)
+    if (event.key === 'ArrowDown')
+      modalPriorityActiveIndex.value = Math.min(modalPriorityOptions.length - 1, Math.max(0, currentIndex) + 1)
+    else
+      modalPriorityActiveIndex.value = Math.max(0, (currentIndex >= 0 ? currentIndex : 0) - 1)
+  }
+}
+
+function handleModalPriorityMenuKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeModalPriorityMenu({ focusTrigger: true })
+    return
+  }
+
+  if (event.key === 'Tab') {
+    closeModalPriorityMenu()
+    return
+  }
+
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    const delta = event.key === 'ArrowDown' ? 1 : -1
+    const next = modalPriorityActiveIndex.value + delta
+    if (next < 0)
+      modalPriorityActiveIndex.value = modalPriorityOptions.length - 1
+    else if (next >= modalPriorityOptions.length)
+      modalPriorityActiveIndex.value = 0
+    else
+      modalPriorityActiveIndex.value = next
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    if (modalPriorityActiveIndex.value >= 0 && modalPriorityActiveIndex.value < modalPriorityOptions.length) {
+      event.preventDefault()
+      selectModalPriority(modalPriorityOptions[modalPriorityActiveIndex.value].value)
+    }
+  }
+}
+
 function resetEditor() {
   editor.title = ''
   editor.note = ''
@@ -332,6 +528,8 @@ async function openEdit(task: Task) {
 function closeEditor() {
   isEditorOpen.value = false
   resetEditor()
+  closeModalStatusMenu()
+  closeModalPriorityMenu()
 }
 
 function focusEditorTitle() {
@@ -456,6 +654,16 @@ function importJson() {
 function handleKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape') return
 
+  if (isModalStatusMenuOpen.value) {
+    closeModalStatusMenu({ focusTrigger: true })
+    return
+  }
+
+  if (isModalPriorityMenuOpen.value) {
+    closeModalPriorityMenu({ focusTrigger: true })
+    return
+  }
+
   if (isStatusMenuOpen.value) {
     closeStatusMenu({ focusTrigger: true })
     return
@@ -484,11 +692,14 @@ onMounted(() => {
 
   if (typeof document !== 'undefined') {
     docPointerDownHandler = (event: Event) => {
-      if (!isStatusMenuOpen.value) return
       const target = event.target as Node | null
       if (!target) return
-      if (!statusRoot.value?.contains(target))
+      if (isStatusMenuOpen.value && !statusRoot.value?.contains(target))
         closeStatusMenu()
+      if (isModalStatusMenuOpen.value && !modalStatusRoot.value?.contains(target))
+        closeModalStatusMenu()
+      if (isModalPriorityMenuOpen.value && !modalPriorityRoot.value?.contains(target))
+        closeModalPriorityMenu()
     }
     document.addEventListener('pointerdown', docPointerDownHandler, true)
   }
@@ -897,20 +1108,132 @@ watch(
             <div class="row">
               <label class="field">
                 <span class="field-label">状态</span>
-                <select v-model="editor.status" class="field-input">
-                  <option value="todo">待办</option>
-                  <option value="doing">进行中</option>
-                  <option value="done">已完成</option>
-                </select>
+                <div ref="modalStatusRoot" class="field-select">
+                  <button
+                    ref="modalStatusTriggerEl"
+                    class="field-trigger"
+                    type="button"
+                    :aria-expanded="isModalStatusMenuOpen ? 'true' : 'false'"
+                    aria-haspopup="listbox"
+                    aria-label="状态"
+                    @click="toggleModalStatusMenu"
+                    @keydown="handleModalStatusTriggerKeydown"
+                  >
+                    <span class="field-trigger-text">{{ modalStatusLabel }}</span>
+                    <span class="field-trigger-chevron" :data-open="isModalStatusMenuOpen ? 'true' : 'false'" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <Transition name="field-pop">
+                    <div
+                      v-show="isModalStatusMenuOpen"
+                      ref="modalStatusMenuEl"
+                      class="field-menu"
+                      role="listbox"
+                      tabindex="-1"
+                      @keydown="handleModalStatusMenuKeydown"
+                    >
+                      <button
+                        v-for="(option, index) in modalStatusOptions"
+                        :key="option.value"
+                        class="field-option"
+                        type="button"
+                        role="option"
+                        :aria-selected="option.value === editor.status ? 'true' : 'false'"
+                        :data-active="index === modalStatusActiveIndex ? 'true' : 'false'"
+                        @mouseenter="modalStatusActiveIndex = index"
+                        @click="selectModalStatus(option.value)"
+                      >
+                        <span class="field-option-label">{{ option.label }}</span>
+                        <span v-if="option.value === editor.status" class="field-option-check" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path
+                              d="M20 6L9 17L4 12"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  </Transition>
+                </div>
               </label>
 
               <label class="field">
                 <span class="field-label">优先级</span>
-                <select v-model="editor.priority" class="field-input">
-                  <option value="low">低</option>
-                  <option value="medium">中</option>
-                  <option value="high">高</option>
-                </select>
+                <div ref="modalPriorityRoot" class="field-select">
+                  <button
+                    ref="modalPriorityTriggerEl"
+                    class="field-trigger"
+                    type="button"
+                    :aria-expanded="isModalPriorityMenuOpen ? 'true' : 'false'"
+                    aria-haspopup="listbox"
+                    aria-label="优先级"
+                    @click="toggleModalPriorityMenu"
+                    @keydown="handleModalPriorityTriggerKeydown"
+                  >
+                    <span class="field-trigger-text">{{ modalPriorityLabel }}</span>
+                    <span class="field-trigger-chevron" :data-open="isModalPriorityMenuOpen ? 'true' : 'false'" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <Transition name="field-pop">
+                    <div
+                      v-show="isModalPriorityMenuOpen"
+                      ref="modalPriorityMenuEl"
+                      class="field-menu"
+                      role="listbox"
+                      tabindex="-1"
+                      @keydown="handleModalPriorityMenuKeydown"
+                    >
+                      <button
+                        v-for="(option, index) in modalPriorityOptions"
+                        :key="option.value"
+                        class="field-option"
+                        type="button"
+                        role="option"
+                        :aria-selected="option.value === editor.priority ? 'true' : 'false'"
+                        :data-active="index === modalPriorityActiveIndex ? 'true' : 'false'"
+                        @mouseenter="modalPriorityActiveIndex = index"
+                        @click="selectModalPriority(option.value)"
+                      >
+                        <span class="field-option-label">{{ option.label }}</span>
+                        <span v-if="option.value === editor.priority" class="field-option-check" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path
+                              d="M20 6L9 17L4 12"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  </Transition>
+                </div>
               </label>
 
               <label class="field">
@@ -1875,6 +2198,164 @@ watch(
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
+.field-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--line) 76%, transparent);
+  background: color-mix(in oklab, var(--vp-c-bg) 92%, white);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.field-select:focus-within {
+  border-color: color-mix(in oklab, var(--brand) 34%, var(--line));
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 14%, transparent);
+  background: color-mix(in oklab, var(--vp-c-bg) 96%, white);
+}
+
+.field-trigger {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  height: 30px;
+  padding: 0 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 760;
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.field-trigger:hover {
+  transform: translateY(-1px);
+}
+
+.field-trigger:active {
+  transform: translateY(0);
+}
+
+.field-trigger-text {
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: color-mix(in oklab, var(--vp-c-text-1) 92%, transparent);
+}
+
+.field-trigger-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--surface-2) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.field-trigger:hover .field-trigger-chevron {
+  color: var(--brand);
+  background: color-mix(in oklab, var(--surface-2) 92%, transparent);
+}
+
+.field-trigger-chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+.field-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  min-width: 140px;
+  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid color-mix(in oklab, var(--brand) 12%, var(--line));
+  background:
+    radial-gradient(360px 200px at 20% 0%, color-mix(in oklab, var(--accent-b) 12%, transparent), transparent 70%),
+    radial-gradient(360px 200px at 80% 0%, color-mix(in oklab, var(--accent-a) 12%, transparent), transparent 72%),
+    color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(12px) saturate(1.06);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  max-height: min(220px, calc(100vh - 320px));
+  overflow: auto;
+  z-index: 6;
+}
+
+.field-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--vp-c-text-1);
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease, color 160ms ease;
+}
+
+.field-option:hover,
+.field-option[data-active="true"] {
+  background: color-mix(in oklab, var(--vp-c-bg) 42%, transparent);
+  border-color: color-mix(in oklab, var(--brand) 14%, transparent);
+}
+
+.field-option:active {
+  transform: translateY(1px);
+}
+
+.field-option[aria-selected="true"] {
+  background: color-mix(in oklab, var(--vp-c-brand-soft) 56%, transparent);
+  border-color: color-mix(in oklab, var(--brand) 22%, transparent);
+}
+
+.field-option-label {
+  min-width: 0;
+  text-align: left;
+}
+
+.field-option-check {
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--surface-2) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--brand) 16%, transparent);
+}
+
+.field-pop-enter-active,
+.field-pop-leave-active {
+  transition: opacity 160ms ease, transform 160ms ease, filter 160ms ease;
+}
+
+.field-pop-enter-from,
+.field-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  filter: blur(8px);
+}
+
 .field-input.area {
   height: auto;
   padding: 10px 12px;
@@ -1917,6 +2398,24 @@ watch(
 
   .more {
     margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-trigger,
+  .field-option {
+    transition: none;
+  }
+
+  .field-pop-enter-active,
+  .field-pop-leave-active {
+    transition: opacity 1ms linear;
+  }
+
+  .field-pop-enter-from,
+  .field-pop-leave-to {
+    transform: none;
+    filter: none;
   }
 }
 </style>
