@@ -26,6 +26,7 @@ pnpm docs:build # 构建网站发布所需要的资源, build之后在 .vitepres
 - 首页包含任务看板（默认时间轴视图）：支持增删改查、看板视图与导入/导出，数据保存在浏览器本地 `localStorage`（key：`dash:task-board:v1`）。
 - 下拉菜单（侧边栏/目录/任务看板筛选/弹窗状态与优先级）使用自定义 listbox + `<Transition>` 实现动效；改动交互时请验证键盘操作（Esc/Enter/↑↓）、层级不被内容遮挡（z-index/stacking context）与 `prefers-reduced-motion`。
 - 任务看板弹窗与底层卡片风格保持一致；调整样式后请确认遮罩层、阴影强度、输入框焦点和按钮视觉在明暗模式下均可读。
+- 日期选择输入需要支持点击字段即可打开系统日历（优先使用 `showPicker`，不支持时至少保持聚焦）。
 - 如需在构建产物里生成每页 Open Graph 图片：`VITEPRESS_OG_IMAGE=1 pnpm docs:build`（默认关闭以提升构建速度）。
 - 图片 ThumbHash（更好的图片占位与渐进加载）会写入 `.vitepress/cache` 并做增量复用；如需临时跳过以提升本地构建/启动速度：`VITEPRESS_THUMB_HASH=0 pnpm docs:dev` / `VITEPRESS_THUMB_HASH=0 pnpm docs:build`。
 

@@ -80,6 +80,7 @@ const editor = reactive({
 })
 
 const dragTaskId = ref<string>('')
+const dueDateInputEl = ref<HTMLInputElement | null>(null)
 
 const counts = computed(() => {
   const acc = { all: 0, todo: 0, doing: 0, done: 0 }
@@ -101,6 +102,16 @@ const modalStatusLabel = computed(() => {
 const modalPriorityLabel = computed(() => {
   return modalPriorityOptions.find(option => option.value === editor.priority)?.label || '中'
 })
+
+function focusMenu(el?: HTMLElement | null) {
+  if (!el) return
+  try {
+    el.focus({ preventScroll: true })
+  }
+  catch {
+    el.focus()
+  }
+}
 
 function nowIso() {
   return new Date().toISOString()
@@ -250,7 +261,7 @@ const boardColumns = computed(() => {
 function openStatusMenu() {
   isStatusMenuOpen.value = true
   statusActiveIndex.value = Math.max(0, statusOptions.findIndex(option => option.value === statusFilter.value))
-  nextTick(() => statusMenuEl.value?.focus?.())
+  nextTick(() => focusMenu(statusMenuEl.value))
 }
 
 function closeStatusMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
@@ -333,7 +344,7 @@ function openModalStatusMenu() {
   isModalStatusMenuOpen.value = true
   isModalPriorityMenuOpen.value = false
   modalStatusActiveIndex.value = Math.max(0, modalStatusOptions.findIndex(option => option.value === editor.status))
-  nextTick(() => modalStatusMenuEl.value?.focus?.())
+  nextTick(() => focusMenu(modalStatusMenuEl.value))
 }
 
 function closeModalStatusMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
@@ -416,7 +427,7 @@ function openModalPriorityMenu() {
   isModalPriorityMenuOpen.value = true
   isModalStatusMenuOpen.value = false
   modalPriorityActiveIndex.value = Math.max(0, modalPriorityOptions.findIndex(option => option.value === editor.priority))
-  nextTick(() => modalPriorityMenuEl.value?.focus?.())
+  nextTick(() => focusMenu(modalPriorityMenuEl.value))
 }
 
 function closeModalPriorityMenu({ focusTrigger = false }: { focusTrigger?: boolean } = {}) {
@@ -649,6 +660,16 @@ function importJson() {
   }
 
   tasks.value = normalized.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+function openDueDatePicker() {
+  const input = dueDateInputEl.value
+  if (!input) return
+  const showPicker = (input as HTMLInputElement & { showPicker?: () => void }).showPicker
+  if (typeof showPicker === 'function')
+    showPicker.call(input)
+  else
+    input.focus()
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -1238,7 +1259,13 @@ watch(
 
               <label class="field">
                 <span class="field-label">截止</span>
-                <input v-model="editor.dueDate" class="field-input" type="date" />
+                <input
+                  ref="dueDateInputEl"
+                  v-model="editor.dueDate"
+                  class="field-input"
+                  type="date"
+                  @click="openDueDatePicker"
+                />
               </label>
             </div>
           </div>
